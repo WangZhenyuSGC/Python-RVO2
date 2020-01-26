@@ -1,6 +1,18 @@
 Python bindings for Optimal Reciprocal Collision Avoidance
 ==========================================================
 
+This fork contains additional logic in `Agent.cpp` so agents can set a `collabCoeff` to denote how collaborative they are:
+- `collabCoeff > 0.5`: overly cooperative agent, will add more than 1/2*u to its velocity
+- `collabCoeff = 0.5`: standard ORCA (each agent does 1/2 the work)
+- `collabCoeff in (0, 0.5)`: less cooperative agent, will barely adjust its velocity to avoid others
+- `collabCoeff = 0`: non-cooperative, will just follow its prefVel
+- `collabCoeff < 0`: anti-cooperative agent, will ignore its own prefVel and try to collide with the nearest agent (position-wise), 
+collabCoeff trades off mimicing the other agent (collab=0 ==> prefVel = other->veloc) vs. trying to hit immediately (collab=-inf ==> prefVel=relPos)
+
+----------
+
+
+
 This repository contains the RVO2 framework, as described below, along with
 [Cython](http://cython.org/)-based Python bindings. Its home is
 [GitHub](https://github.com/sybrenstuvel/Python-RVO2). New updates are released
