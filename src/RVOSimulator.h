@@ -593,6 +593,20 @@ namespace RVO {
 		 */
 		void setTimeStep(float timeStep);
 
+		/**
+		 * \brief      Remove the selected agent from the simulation.
+		 * \param      agentNo        The number of the agent to be removed.
+		 */
+
+		void removeAgent(size_t agentNo);
+
+		/**
+		 * \brief      Remove the selected obst from the simulation.
+		 * \param      obstacleNo     The number of the obstacle to be removed.
+		 */
+		void removeObstacle(size_t obstacleNo);
+		
+
 	private:
 		std::vector<Agent *> agents_;
 		Agent *defaultAgent_;

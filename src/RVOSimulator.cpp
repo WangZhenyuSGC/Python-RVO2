@@ -376,4 +376,22 @@ namespace RVO {
 	{
 		timeStep_ = timeStep;
 	}
+
+	void RVOSimulator::removeAgent(size_t agentNo)
+	{
+		delete agents_[agentNo];
+
+		agents_[agentNo] = agents_.back();
+		agents_[agentNo]->id_ = agentNo;
+		agents_.pop_back();
+	}
+
+	void RVOSimulator::removeObstacle(size_t obstacleNo)
+	{
+		delete obstacles_[obstacleNo];
+
+		obstacles_[obstacleNo] = obstacles_.back();
+		obstacles_[obstacleNo]->id_ = obstacleNo;
+		obstacles_.pop_back();
+	}
 }
