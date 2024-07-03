@@ -75,6 +75,8 @@ cdef extern from "RVOSimulator.h" namespace "RVO":
         void setAgentCollabCoeff(size_t agentNo, float collabCoeff)
         void setAgentVelocity(size_t agentNo, const Vector2 & velocity)
         void setTimeStep(float timeStep)
+        void removeAgent(size_t agentNo)
+        void removeObstacle(size_t obstacleNo)
 
 
 cdef class PyRVOSimulator:
@@ -228,3 +230,7 @@ cdef class PyRVOSimulator:
         self.thisptr.setAgentVelocity(agent_no, c_velocity)
     def setTimeStep(self, float time_step):
         self.thisptr.setTimeStep(time_step)
+    def removeAgent(self, size_t agent_no):
+        self.thisptr.removeAgent(agent_no)
+    def removeObstacle(self, size_t agent_no):
+        self.thisptr.removeObstacle(agent_no)
