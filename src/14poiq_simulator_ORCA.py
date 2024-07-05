@@ -57,11 +57,14 @@ class RobotSimulation:
                                           1.5 * self.AVOIDANCE_THRESHOLD,
                                           10,
                                           self.time_horizon,
-                                          0.5 * self.time_horizon,
+                                          0.1 * self.time_horizon,
                                           self.effective_radius,
                                           self.lv_limit)
         self.fig, self.ax = plt.subplots()
         self.ani = None
+
+        self.obsts = []
+        self.obst_num = None
 
         self.robot_init()
 
@@ -87,11 +90,6 @@ class RobotSimulation:
                                                "theta": 0
                                               }
         
-        # self.targets = { "target1": {"id": "target1", "pose": {"x": 200, "y": 200, "theta": 0}},
-        #                  "target2": {"id": "target2", "pose": {"x": 300, "y": 400, "theta": 0}},
-        #                  "target3": {"id": "target3", "pose": {"x": 400, "y": 200, "theta": 0}},
-        #                 }
-        
         self.robots = {}
         for i in range(self.robot_number):  
             robot_pose = self.generate_safe_pose(self.robots)
@@ -105,10 +103,10 @@ class RobotSimulation:
                 "goal_flag": False
             }
 
-        # for i in range(self.robot_number):
-        #     robot_id = f"robot{i+1}"
-        #     self.robots[robot_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
-        #     # self.robots[robot_id]["pose"] = {"x": 200, "y": 320 + i * 800, "theta": random.uniform(-np.pi, np.pi)} 
+        for i in range(self.robot_number):
+            robot_id = f"robot{i+1}"
+            self.robots[robot_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
+            # self.robots[robot_id]["pose"] = {"x": 200, "y": 320 + i * 800, "theta": random.uniform(-np.pi, np.pi)} 
 
         # self.robots["robot1"]["pose"] = {"x": 600, "y": 500, "theta": 0}
         # self.robots["robot2"]["pose"] = {"x": 400, "y": 1000, "theta": 0}
@@ -120,14 +118,15 @@ class RobotSimulation:
             target_id = f"target{(i % len(self.targets)) + 1}"
             self.robots[robot_id]["goal"] = self.targets[target_id]["pose"]
             # 初期位置を
-            agent_id = self.rvosim.addAgent((self.robots[robot_id]["pose"]["x"],self.robots[robot_id]["pose"]["y"]))
+            agent_id = self.rvosim.addAgentID((self.robots[robot_id]["pose"]["x"],self.robots[robot_id]["pose"]["y"]))
             self.agent_ids[robot_id] = agent_id
-            self.rvosim.setAgentCollabCoeff(agent_id, 0.5)
+            self.rvosim.setAgentCollabCoeff(agent_id, 1.0)
 
         self.distances = {}
         self.low_speed_time = {} 
         self.finished_agents = set()
         self.dead_agents = set()
+        self.fallen_agents = set()
 
         # Boundary設定
         vertices = []
@@ -137,7 +136,9 @@ class RobotSimulation:
         vertices.append((self.FIELD_WIDTH, 0))
         vertices.append((0,0))
 
-        self.rvosim.addObstacle(vertices)
+        self.obsts.append(vertices)
+
+        print("The returned number of obstacle:", self.rvosim.addObstacle(vertices))
         self.rvosim.processObstacles()
 
     def generate_safe_pose(self, group):
@@ -208,6 +209,19 @@ class RobotSimulation:
         
         agent_id = self.agent_ids[robot_id]
         self.distances[agent_id] = {"distance": distance_to_goal}
+        
+        if robot_id in self.fallen_agents:
+            # self.rvosim.removeAgent(agent_id)
+            # print("REMOVED!!!")            
+            self.rvosim.setAgentMaxSpeed(agent_id, 0)
+            # self.rvosim.setAgentCollabCoeff(agent_id, 0.0)
+            self.rvosim.setAgentPosition(agent_id, (effective_center[0], effective_center[1]))
+            self.rvosim.setAgentVelocity(agent_id, (0.0,0.0))
+            self.rvosim.setAgentPrefVelocity(agent_id, (0, 0))
+            return
+
+        self.rvosim.setAgentMaxSpeed(agent_id, self.lv_limit)
+        self.rvosim.setAgentCollabCoeff(agent_id, 0.5)
 
         if abs(distance_to_goal) <= self.POS_THRESHOLD:
             robot["pos_flag"] = True
@@ -262,7 +276,6 @@ class RobotSimulation:
             print("---------------------------This robot seems to suffer from a dead lock---------------------------", agent_id)
             self.dead_agents.add(agent_id)
 
-
         elif self.low_speed_time.get(agent_id, 0) < self.deadlock_time_limit and agent_id in self.dead_agents:
             self.dead_agents.remove(agent_id)
 
@@ -309,16 +322,11 @@ class RobotSimulation:
     def update_command(self):
         for robot_id, robot in self.robots.items():
             agent_id = self.agent_ids[robot_id]
-
-            # v,w = self.calc_slalom(agent_id, robot)
-            # v,w = self.pos_twist(agent_id, robot)
-            # v,w = self.vel_twist(agent_id, robot)
-            # v,w = self.vel_slalom(agent_id, robot)
             v,w = self.enlarge_twist(agent_id, robot)
 
-            if abs(w) > abs(self.w_limit):
-                print('--------------------------robot id, v, w before clip', (agent_id, v, w))
-                pass
+            # if abs(w) > abs(self.w_limit):
+            #     print('--------------------------robot id, v, w before clip', (agent_id, v, w))
+            #     pass
 
             v = clip(v, -self.lv_limit, self.lv_limit)
             w = clip(w, -self.w_limit, self.w_limit)   
@@ -345,6 +353,10 @@ class RobotSimulation:
         target_theta = robot["goal"]["theta"]
         
         agent_id = self.agent_ids[robot_id]
+
+        # draw the obstacle
+        for obst in self.obsts:
+            self.ax.plot([obst[i][0] for i in range(len(obst))], [obst[i][1] for i in range(len(obst))], 'r-')
 
         if self.rvosim.getAgentCollabCoeff(agent_id) == 1.0:
             self.ax.add_artist(plt.Circle([x, y], self.ROBOT_RADIUS, color='green', fill=True))
@@ -447,7 +459,39 @@ class RobotSimulation:
         if event.key == 'q':
             self.stop_animation = True
         if event.key == 'k':
-            self.ani = animation.FuncAnimation(self.fig, self.main_loop, frames=30, interval=self.FREQUENCY)
+            self.ani = animation.FuncAnimation(self.fig,   self.main_loop, frames=30, interval=self.FREQUENCY)
+        if event.key == 'd':
+            dead_pos = self.rvosim.getAgentPosition(self.agent_ids["robot1"])
+
+            self.robots["robot1"]["velocity"]["v"] = 0
+            self.robots["robot1"]["velocity"]["w"] = 0
+
+            self.fallen_agents.add("robot1")
+            # generate several ellipse vertices 
+            vertices = []
+            for i in range(0, 390, 30):
+                x = dead_pos[0] + 1.5 * self.ROBOT_RADIUS * math.cos(math.radians(i))
+                y = dead_pos[1] + 0.8 * self.ROBOT_RADIUS * math.sin(math.radians(i))
+                vertices.append((x, y))
+            
+            # rotate the vertices around a random angle
+            angle = random.uniform(-math.pi, math.pi)
+            for i in range(len(vertices)):
+                x = (vertices[i][0] - dead_pos[0]) * math.cos(angle) - (vertices[i][1] - dead_pos[1]) * math.sin(angle) + dead_pos[0]
+                y = (vertices[i][0] - dead_pos[0]) * math.sin(angle) + (vertices[i][1] - dead_pos[1]) * math.cos(angle) + dead_pos[1]
+                vertices[i] = (x, y)
+
+            self.obsts.append(vertices)
+            self.obst_num = self.rvosim.addObstacle(vertices)
+            self.rvosim.processObstacles()
+
+        if event.key == 'r':
+            # new_id = self.rvosim.addAgentID((self.robots["robot1"]["pose"]["x"],self.robots["robot1"]["pose"]["y"]))
+            # print("new agent id:", new_id)
+            self.rvosim.removeObstacle(self.obst_num)
+            self.rvosim.processObstacles()
+            self.obsts.pop()
+            self.fallen_agents.remove("robot1")            
 
     def start_animation(self):
         self.fig.canvas.mpl_connect('key_press_event', self.on_key)

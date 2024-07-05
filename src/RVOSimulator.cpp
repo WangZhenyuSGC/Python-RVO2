@@ -377,21 +377,98 @@ namespace RVO {
 		timeStep_ = timeStep;
 	}
 
+	size_t RVOSimulator::addAgentID(const Vector2 &position)
+	{
+		if (defaultAgent_ == NULL) {
+			return RVO_ERROR;
+		}
+
+		Agent *agent = new Agent(this);
+
+		agent->position_ = position;
+		agent->maxNeighbors_ = defaultAgent_->maxNeighbors_;
+		agent->maxSpeed_ = defaultAgent_->maxSpeed_;
+		agent->neighborDist_ = defaultAgent_->neighborDist_;
+		agent->radius_ = defaultAgent_->radius_;
+		agent->timeHorizon_ = defaultAgent_->timeHorizon_;
+		agent->timeHorizonObst_ = defaultAgent_->timeHorizonObst_;
+		agent->velocity_ = defaultAgent_->velocity_;
+
+		// Find the next available ID
+		size_t agentId = agents_.size();
+		for (size_t i = 0; i < agents_.size(); ++i) {
+			if (agents_[i] == nullptr) {
+				agentId = i;
+				break;
+			}
+		}
+
+		agent->id_ = agentId;
+
+		if (agentId == agents_.size()) {
+			agents_.push_back(agent);
+		} else {
+			agents_[agentId] = agent;
+		}
+
+		return agentId;
+	}
+
 	void RVOSimulator::removeAgent(size_t agentNo)
 	{
-		delete agents_[agentNo];
+		if (agentNo >= agents_.size() || agents_[agentNo] == nullptr) {
+			throw std::out_of_range("Agent ID is out of range or already removed");
+		}
 
-		agents_[agentNo] = agents_.back();
-		agents_[agentNo]->id_ = agentNo;
-		agents_.pop_back();
+		// Delete the agent object to free memory
+		delete agents_[agentNo];
+		agents_[agentNo] = nullptr;
 	}
 
 	void RVOSimulator::removeObstacle(size_t obstacleNo)
 	{
-		delete obstacles_[obstacleNo];
+		if (obstacleNo >= obstacles_.size()) {
+			throw std::out_of_range("Obstacle number is out of range");
+		}
 
-		obstacles_[obstacleNo] = obstacles_.back();
-		obstacles_[obstacleNo]->id_ = obstacleNo;
-		obstacles_.pop_back();
+		// Identify the start of the obstacle loop
+		Obstacle* startObstacle = obstacles_[obstacleNo];
+		Obstacle* currentObstacle = startObstacle;
+
+		// Collect obstacles to delete
+		std::vector<Obstacle*> obstaclesToDelete;
+
+		do {
+			obstaclesToDelete.push_back(currentObstacle);
+			currentObstacle = currentObstacle->nextObstacle_;
+		} while (currentObstacle != startObstacle);
+
+		// Update the prevObstacle and nextObstacle pointers
+		for (Obstacle* obstacle : obstaclesToDelete) {
+			if (obstacle->prevObstacle_) {
+				obstacle->prevObstacle_->nextObstacle_ = obstacle->nextObstacle_;
+			}
+			if (obstacle->nextObstacle_) {
+				obstacle->nextObstacle_->prevObstacle_ = obstacle->prevObstacle_;
+			}
+		}
+
+		// Remove the obstacles from the vector
+		for (Obstacle* obstacle : obstaclesToDelete) {
+			auto it = std::find(obstacles_.begin(), obstacles_.end(), obstacle);
+			if (it != obstacles_.end()) {
+				obstacles_.erase(it);
+			}
+		}
+
+		// Update the IDs of the remaining obstacles
+		for (size_t i = 0; i < obstacles_.size(); ++i) {
+			obstacles_[i]->id_ = i;
+		}
+
+		// Delete the marked obstacles
+		for (Obstacle* obstacle : obstaclesToDelete) {
+			delete obstacle;
+		}
 	}
 }

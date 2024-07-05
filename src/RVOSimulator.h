@@ -594,6 +594,15 @@ namespace RVO {
 		void setTimeStep(float timeStep);
 
 		/**
+		 * \brief      Add a new agent to the simulation with better id management.
+		 * \param      position        The two-dimensional starting position of
+		 *                             this agent.
+		 * \return     The number of the agent, or RVO::RVO_ERROR when the agent
+		 *             defaults have not been set.
+		 */
+		size_t addAgentID(const Vector2 &position);
+
+		/**
 		 * \brief      Remove the selected agent from the simulation.
 		 * \param      agentNo        The number of the agent to be removed.
 		 */
