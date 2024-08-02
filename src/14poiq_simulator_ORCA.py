@@ -1,4 +1,5 @@
 import sys
+# TODO: 自分のパスに合わせて変更
 sys.path.append('/home/0000410764/workspace/aii-proto/remote_pc/ros2_ws/src/Python-RVO2')
 
 import matplotlib.pyplot as plt
@@ -14,7 +15,7 @@ print(rvo2.__file__)
 
 class RobotSimulation:
     def __init__(self):
-        self.ROBOT_RADIUS = 40 # ロボット半径
+        self.ROBOT_RADIUS = 36 # ロボット半径
         self.AVOIDANCE_THRESHOLD = 200 #衝突判定用距離
         
         self.ARROWLENGTH = 50
@@ -29,7 +30,7 @@ class RobotSimulation:
         self.deadlock_time_limit = 2.5 # unit: s
         self.vel_threshold = 40 # unit: mm/s
 
-        self.lv_limit = 100
+        self.lv_limit = 300
         self.w_limit = np.pi
         
         self.time_horizon = 100 * self.FREQUENCY
@@ -42,7 +43,7 @@ class RobotSimulation:
         self.L = 25
         self.effective_radius = self.D + self.ROBOT_RADIUS
 
-        self.robot_number = 5
+        self.robot_number = 15
         self.stop_animation = False
         # RVOSimulator(float timeStep, 
         #              float neighborDist, 
@@ -54,10 +55,10 @@ class RobotSimulation:
         # 　　　　　　　const Vector2 &velocity)　OPTIONAL 
 
         self.rvosim = rvo2.PyRVOSimulator(self.FREQUENCY,
-                                          1.5 * self.AVOIDANCE_THRESHOLD,
+                                          3 * self.AVOIDANCE_THRESHOLD,
                                           10,
                                           self.time_horizon,
-                                          0.1 * self.time_horizon,
+                                          0.5 * self.time_horizon,
                                           self.effective_radius,
                                           self.lv_limit)
         self.fig, self.ax = plt.subplots()
@@ -83,12 +84,12 @@ class RobotSimulation:
         #     #self.targets[target_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": 0}
         #     self.targets[target_id]["pose"] = {"x": 200, "y": 1120 - i * 800, "theta": 0}
         
-        for i in range(self.robot_number):
-            target_id = f"target{i+1}"
-            self.targets[target_id]["pose"] = {"x": self.circle_radius * np.cos(2 * np.pi * i / self.robot_number) + self.center_x,
-                                               "y": self.circle_radius * np.sin(2 * np.pi * i/ self.robot_number) + self.center_y,
-                                               "theta": 0
-                                              }
+        # for i in range(self.robot_number):
+        #     target_id = f"target{i+1}"
+        #     self.targets[target_id]["pose"] = {"x": self.circle_radius * np.cos(2 * np.pi * i / self.robot_number) + self.center_x,
+        #                                        "y": self.circle_radius * np.sin(2 * np.pi * i/ self.robot_number) + self.center_y,
+        #                                        "theta": 0
+        #                                       }
         
         self.robots = {}
         for i in range(self.robot_number):  
@@ -103,24 +104,65 @@ class RobotSimulation:
                 "goal_flag": False
             }
 
-        for i in range(self.robot_number):
-            robot_id = f"robot{i+1}"
-            self.robots[robot_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
-            # self.robots[robot_id]["pose"] = {"x": 200, "y": 320 + i * 800, "theta": random.uniform(-np.pi, np.pi)} 
+        # for i in range(self.robot_number):
+        #     robot_id = f"robot{i+1}"
+        #     self.robots[robot_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
+        #     # self.robots[robot_id]["pose"] = {"x": 200, "y": 320 + i * 800, "theta": random.uniform(-np.pi, np.pi)} 
 
         # self.robots["robot1"]["pose"] = {"x": 600, "y": 500, "theta": 0}
         # self.robots["robot2"]["pose"] = {"x": 400, "y": 1000, "theta": 0}
         # self.robots["robot3"]["pose"] = {"x": 100, "y": 800, "theta": 0}
 
+        device_num_per_line = 4
+
+        for i in range(self.robot_number):
+            robot_id = f"robot{i+1}"
+            update_target_x = 100 + 200 * ((i // 2) % device_num_per_line)
+            
+            if i % 2 == 0:
+                update_target_x = 100 + 200 * ((i // 2) % device_num_per_line)
+                if i <= device_num_per_line * 2 - 2:
+                    update_target_y = 100
+                elif i <= device_num_per_line * 4 - 2:
+                    update_target_y = 300
+            else:
+                update_target_x = 200 + 200 * ((i // 2) % device_num_per_line)
+                if i <= device_num_per_line * 2 - 1:
+                    update_target_y = 1300
+                elif i <= device_num_per_line * 4 - 1:
+                    update_target_y = 1100
+            
+            self.robots[robot_id]["pose"] = {"x": update_target_x, "y": update_target_y, "theta": 0}
+            
+        
+        for i in range(self.robot_number):
+            target_id = f"target{i+1}"
+            update_target_x = 100 + 200 * ((i // 2) % device_num_per_line)
+            
+            if i % 2 == 0:
+                update_target_x = 100 + 200 * ((i // 2) % device_num_per_line)
+                if i <= device_num_per_line * 2 - 2:
+                    update_target_y = 1100
+                elif i <= device_num_per_line * 4 - 2:
+                    update_target_y = 1300
+            else:
+                update_target_x = 200 + 200 * ((i // 2) % device_num_per_line)
+                if i <= device_num_per_line * 2 - 1:
+                    update_target_y = 300
+                elif i <= device_num_per_line * 4 - 1:
+                    update_target_y = 100
+            
+            self.targets[target_id]["pose"] = {"x": update_target_x, "y": update_target_y, "theta": 0}
+    
         self.agent_ids = {} # RVO agents
 
         for i, robot_id in enumerate(self.robots):
             target_id = f"target{(i % len(self.targets)) + 1}"
             self.robots[robot_id]["goal"] = self.targets[target_id]["pose"]
             # 初期位置を
-            agent_id = self.rvosim.addAgentID((self.robots[robot_id]["pose"]["x"],self.robots[robot_id]["pose"]["y"]))
+            agent_id = self.rvosim.addAgent((self.robots[robot_id]["pose"]["x"],self.robots[robot_id]["pose"]["y"]))
             self.agent_ids[robot_id] = agent_id
-            self.rvosim.setAgentCollabCoeff(agent_id, 1.0)
+            self.rvosim.setAgentCollabCoeff(agent_id, 0.5)
 
         self.distances = {}
         self.low_speed_time = {} 
@@ -138,7 +180,6 @@ class RobotSimulation:
 
         self.obsts.append(vertices)
 
-        print("The returned number of obstacle:", self.rvosim.addObstacle(vertices))
         self.rvosim.processObstacles()
 
     def generate_safe_pose(self, group):
@@ -324,9 +365,9 @@ class RobotSimulation:
             agent_id = self.agent_ids[robot_id]
             v,w = self.enlarge_twist(agent_id, robot)
 
-            # if abs(w) > abs(self.w_limit):
-            #     print('--------------------------robot id, v, w before clip', (agent_id, v, w))
-            #     pass
+            if abs(w) > abs(self.w_limit):
+                print('--------------------------robot id, v, w before clip', (agent_id, v, w))
+                pass
 
             v = clip(v, -self.lv_limit, self.lv_limit)
             w = clip(w, -self.w_limit, self.w_limit)   
@@ -371,15 +412,15 @@ class RobotSimulation:
                             arrowprops=dict(arrowstyle='-|>', facecolor='red', edgecolor='red'))
         # self.ax.annotate('', [target_x + self.ARROWLENGTH * np.cos(target_theta), target_y + self.ARROWLENGTH * np.sin(target_theta)], [target_x, target_y],
                             # arrowprops=dict(arrowstyle='-|>', facecolor='blue', edgecolor='blue'))
-        self.ax.text(x, y, agent_id, color='white', ha='center', va='center')
+        self.ax.text(x, y, agent_id + 1, color='white', ha='center', va='center')
 
     def update_loop(self, robot_id, robot):
         self.move(robot_id, robot)
         # self.update_status(robot_id, robot)
         self.update_status_enlarge(robot_id, robot)
-        # agent_id = self.agent_ids[robot_id]
-        # if agent_id in self.dead_agents:
-        #     self.adjust_pref_vel(agent_id)
+        agent_id = self.agent_ids[robot_id]
+        if agent_id in self.dead_agents:
+            self.adjust_pref_vel(agent_id)
         self.update_trajectory(robot_id, robot)
             
     def main_loop(self, frame):
@@ -472,8 +513,7 @@ class RobotSimulation:
             for i in range(0, 390, 30):
                 x = dead_pos[0] + 1.5 * self.ROBOT_RADIUS * math.cos(math.radians(i))
                 y = dead_pos[1] + 0.8 * self.ROBOT_RADIUS * math.sin(math.radians(i))
-                vertices.append((x, y))
-            
+                vertices.append((x, y))            
             # rotate the vertices around a random angle
             angle = random.uniform(-math.pi, math.pi)
             for i in range(len(vertices)):
