@@ -115,24 +115,24 @@ class RobotSimulation:
 
         device_num_per_line = 4
 
-        for i in range(self.robot_number):
-            robot_id = f"robot{i+1}"
-            update_target_x = 100 + 200 * ((i // 2) % device_num_per_line)
+        # for i in range(self.robot_number):
+        #     robot_id = f"robot{i+1}"
+        #     update_target_x = 100 + 200 * ((i // 2) % device_num_per_line)
             
-            if i % 2 == 0:
-                update_target_x = 100 + 200 * ((i // 2) % device_num_per_line)
-                if i <= device_num_per_line * 2 - 2:
-                    update_target_y = 100
-                elif i <= device_num_per_line * 4 - 2:
-                    update_target_y = 300
-            else:
-                update_target_x = 200 + 200 * ((i // 2) % device_num_per_line)
-                if i <= device_num_per_line * 2 - 1:
-                    update_target_y = 1300
-                elif i <= device_num_per_line * 4 - 1:
-                    update_target_y = 1100
+        #     if i % 2 == 0:
+        #         update_target_x = 100 + 200 * ((i // 2) % device_num_per_line)
+        #         if i <= device_num_per_line * 2 - 2:
+        #             update_target_y = 100
+        #         elif i <= device_num_per_line * 4 - 2:
+        #             update_target_y = 300
+        #     else:
+        #         update_target_x = 200 + 200 * ((i // 2) % device_num_per_line)
+        #         if i <= device_num_per_line * 2 - 1:
+        #             update_target_y = 1300
+        #         elif i <= device_num_per_line * 4 - 1:
+        #             update_target_y = 1100
             
-            self.robots[robot_id]["pose"] = {"x": update_target_x, "y": update_target_y, "theta": 0}
+        #     self.robots[robot_id]["pose"] = {"x": update_target_x, "y": update_target_y, "theta": 0}
             
         
         for i in range(self.robot_number):
@@ -261,8 +261,8 @@ class RobotSimulation:
             self.rvosim.setAgentPrefVelocity(agent_id, (0, 0))
             return
 
-        self.rvosim.setAgentMaxSpeed(agent_id, self.lv_limit)
-        self.rvosim.setAgentCollabCoeff(agent_id, 0.5)
+        # self.rvosim.setAgentMaxSpeed(agent_id, self.lv_limit)
+        # self.rvosim.setAgentCollabCoeff(agent_id, 0.5)
 
         if abs(distance_to_goal) <= self.POS_THRESHOLD:
             robot["pos_flag"] = True
