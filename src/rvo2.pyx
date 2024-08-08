@@ -78,6 +78,8 @@ cdef extern from "RVOSimulator.h" namespace "RVO":
         size_t addAgentID(const Vector2 & position)
         void removeAgent(size_t agentNo)
         void removeObstacle(size_t obstacle_no)
+        void setAgentDeadLock(size_t agentNo, bool isDeadLock)
+        bool getAgentDeadLock(size_t agentNo) const
 
 
 cdef class PyRVOSimulator:
@@ -242,3 +244,7 @@ cdef class PyRVOSimulator:
         self.thisptr.removeAgent(agent_no)
     def removeObstacle(self, size_t obstacle_no):
         self.thisptr.removeObstacle(obstacle_no)
+    def setAgentDeadLock(self, size_t agent_no, bool is_dead_Lock):
+        self.thisptr.setAgentDeadLock(agent_no, is_dead_Lock)
+    def getAgentDeadLock(self, size_t agent_no):
+        self.thisprt.getAgentDeadLock(agent_no)

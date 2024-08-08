@@ -467,4 +467,14 @@ namespace RVO {
 			delete obstacle;
 		}
 	}
+
+	void RVOSimulator::setAgentDeadLock(size_t agentNo, bool isDeadLock)
+	{
+		agents_[agentNo]->isDeadLock_ = isDeadLock;
+	}
+
+	bool RVOSimulator::getAgentDeadLock(size_t agentNo) const
+	{
+		return agents_[agentNo]->isDeadLock_;
+	}
 }

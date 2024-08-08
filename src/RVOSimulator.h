@@ -614,6 +614,20 @@ namespace RVO {
 		 * \param      obstacleNo     The number of the obstacle to be removed.
 		 */
 		void removeObstacle(size_t obstacleNo);
+
+		/**
+		 * \brief      Set the dead lock flag of the selected agent.
+		 * \param      agentNo        The number of the agent to be removed.
+		 * \param      isDeadLock     The flag to be set.
+		 */
+		void setAgentDeadLock(size_t agentNo, bool isDeadLock);
+
+		/**
+		 * \brief      Get the dead lock flag of the selected agent.
+		 * \param      agentNo        The number of the agent to be removed.
+		 * \return     The dead lock flag of the selected agent.
+		 */
+		bool getAgentDeadLock(size_t agentNo) const;
 		
 
 	private:

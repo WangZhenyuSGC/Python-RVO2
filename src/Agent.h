@@ -103,6 +103,7 @@ namespace RVO {
 		float collabCoeff_;
 
 		size_t id_;
+		bool isDeadLock_; // DeadLock処理用フラグ
 
 		friend class KdTree;
 		friend class RVOSimulator;

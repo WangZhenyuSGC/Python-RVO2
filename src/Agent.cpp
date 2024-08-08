@@ -39,7 +39,7 @@
 #include <algorithm>
 
 namespace RVO {
-    Agent::Agent(RVOSimulator *sim) : maxNeighbors_(0), maxSpeed_(0.0f), neighborDist_(0.0f), radius_(0.0f), sim_(sim), timeHorizon_(0.0f), timeHorizonObst_(0.0f), collabCoeff_(0.5f), id_(0) { }
+    Agent::Agent(RVOSimulator *sim) : maxNeighbors_(0), maxSpeed_(0.0f), neighborDist_(0.0f), radius_(0.0f), sim_(sim), timeHorizon_(0.0f), timeHorizonObst_(0.0f), collabCoeff_(0.5f), id_(0), isDeadLock_(false) { }
 
     void Agent::computeNeighbors()
     {
@@ -416,7 +416,9 @@ namespace RVO {
 
         size_t lineFail = linearProgram2(orcaLines_, maxSpeed_, prefVelocity_, false, newVelocity_);
 
-        if (lineFail < orcaLines_.size()) {
+        if (lineFail < orcaLines_.size() || isDeadLock_) 
+        {
+            // DeadLockの場合は優先的にlinearProgram3で解を求める
             linearProgram3(orcaLines_, numObstLines, lineFail, maxSpeed_, newVelocity_);
         }
     }
