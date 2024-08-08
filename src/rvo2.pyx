@@ -247,4 +247,4 @@ cdef class PyRVOSimulator:
     def setAgentDeadLock(self, size_t agent_no, bool is_dead_Lock):
         self.thisptr.setAgentDeadLock(agent_no, is_dead_Lock)
     def getAgentDeadLock(self, size_t agent_no):
-        self.thisprt.getAgentDeadLock(agent_no)
+        self.thisptr.getAgentDeadLock(agent_no)
