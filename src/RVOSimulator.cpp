@@ -416,13 +416,9 @@ namespace RVO {
 
 	void RVOSimulator::removeAgent(size_t agentNo)
 	{
-		if (agentNo >= agents_.size() || agents_[agentNo] == nullptr) {
-			throw std::out_of_range("Agent ID is out of range or already removed");
-		}
-
-		// Delete the agent object to free memory
 		delete agents_[agentNo];
-		agents_[agentNo] = nullptr;
+		agents_[agentNo] = agents_.back();
+		agents_.pop_back();
 	}
 
 	void RVOSimulator::removeObstacle(size_t obstacleNo)
