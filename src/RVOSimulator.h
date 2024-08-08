@@ -627,7 +627,7 @@ namespace RVO {
 		 * \param      agentNo        The number of the agent to be removed.
 		 * \return     The dead lock flag of the selected agent.
 		 */
-		bool getAgentDeadLock(size_t agentNo) const;
+		bool getAgentDeadLock(size_t agentNo);
 		
 
 	private:
