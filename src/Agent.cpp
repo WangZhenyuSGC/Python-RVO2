@@ -416,7 +416,8 @@ namespace RVO {
 
         size_t lineFail = linearProgram2(orcaLines_, maxSpeed_, prefVelocity_, false, newVelocity_);
 
-        if (lineFail < orcaLines_.size() || isDeadLock_) 
+        // なぜかisDeadLock_の初期化がうまく行かないので一旦すべてのエージェントがDeadLockとして扱われるようにする
+        if (lineFail < orcaLines_.size() || true) 
         {
             // DeadLockの場合は優先的にlinearProgram3で解を求める
             linearProgram3(orcaLines_, numObstLines, lineFail, maxSpeed_, newVelocity_);
