@@ -39,7 +39,7 @@
 #include <algorithm>
 
 namespace RVO {
-    Agent::Agent(RVOSimulator *sim) : maxNeighbors_(0), maxSpeed_(0.0f), neighborDist_(0.0f), radius_(0.0f), sim_(sim), timeHorizon_(0.0f), timeHorizonObst_(0.0f), collabCoeff_(0.5f), isDeadLock_(false), id_(0) {std::cout << "Constructor: isDeadLock_ = " << isDeadLock_ << std::endl;}
+    Agent::Agent(RVOSimulator *sim) : maxNeighbors_(0), maxSpeed_(0.0f), neighborDist_(0.0f), radius_(0.0f), sim_(sim), timeHorizon_(0.0f), timeHorizonObst_(0.0f), collabCoeff_(0.5f), isDeadLock_(false), id_(0) {}
 
     void Agent::computeNeighbors()
     {

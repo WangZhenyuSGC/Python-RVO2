@@ -58,8 +58,6 @@ namespace RVO {
 		defaultAgent_->timeHorizon_ = timeHorizon;
 		defaultAgent_->timeHorizonObst_ = timeHorizonObst;
 		defaultAgent_->velocity_ = velocity;
-		defaultAgent_->collabCoeff_ = 0.5f;
-		defaultAgent_->isDeadLock_ = false;
 	}
 
 	RVOSimulator::~RVOSimulator()
@@ -95,10 +93,8 @@ namespace RVO {
 		agent->timeHorizon_ = defaultAgent_->timeHorizon_;
 		agent->timeHorizonObst_ = defaultAgent_->timeHorizonObst_;
 		agent->velocity_ = defaultAgent_->velocity_;
-		agent->collabCoeff_ = 0.5f;
 
 		agent->id_ = agents_.size();
-		agent->isDeadLock_ = false;
 
 		agents_.push_back(agent);
 
@@ -117,10 +113,8 @@ namespace RVO {
 		agent->timeHorizon_ = timeHorizon;
 		agent->timeHorizonObst_ = timeHorizonObst;
 		agent->velocity_ = velocity;
-		agent->collabCoeff_ = 0.5f;
 
 		agent->id_ = agents_.size();
-		agent->isDeadLock_ = false;
 
 		agents_.push_back(agent);
 
