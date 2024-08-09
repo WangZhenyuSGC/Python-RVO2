@@ -79,7 +79,7 @@ cdef extern from "RVOSimulator.h" namespace "RVO":
         void removeAgent(size_t agentNo)
         void removeObstacle(size_t obstacle_no)
         void setAgentDeadLock(size_t agentNo, bool isDeadLock)
-        bool getAgentDeadLock(size_t agentNo)
+        bool getAgentDeadLock(size_t agentNo) const
 
 
 cdef class PyRVOSimulator:

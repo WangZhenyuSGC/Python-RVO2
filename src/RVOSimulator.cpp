@@ -479,7 +479,7 @@ namespace RVO {
 		agents_[agentNo]->isDeadLock_ = isDeadLock;
 	}
 
-	bool RVOSimulator::getAgentDeadLock(size_t agentNo)
+	bool RVOSimulator::getAgentDeadLock(size_t agentNo) const
 	{
 		return agents_[agentNo]->isDeadLock_;
 	}
