@@ -101,9 +101,9 @@ namespace RVO {
 		float timeHorizonObst_;
 		Vector2 velocity_;
 		float collabCoeff_;
+		bool isDeadLock_; // DeadLock処理用フラグ
 
 		size_t id_;
-		bool isDeadLock_; // DeadLock処理用フラグ
 
 		friend class KdTree;
 		friend class RVOSimulator;
