@@ -51,5 +51,18 @@ if(WIN32)
     set_target_properties(RVO PROPERTIES COMPILE_DEFINITIONS NOMINMAX)
 endif()
 
+# Find the OpenMP package
+find_package(OpenMP REQUIRED)
+
+# Link the OpenMP libraries
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(RVO PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
+# Add the OpenMP compile flags
+if(OpenMP_CXX_FOUND)
+    target_compile_options(RVO PUBLIC ${OpenMP_CXX_FLAGS})
+
+endif()
 install(FILES ${RVO_HEADERS} DESTINATION include)
 install(TARGETS RVO DESTINATION lib)
