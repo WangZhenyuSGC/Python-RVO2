@@ -62,7 +62,7 @@ endif()
 # Add the OpenMP compile flags
 if(OpenMP_CXX_FOUND)
     target_compile_options(RVO PUBLIC ${OpenMP_CXX_FLAGS})
-
 endif()
+
 install(FILES ${RVO_HEADERS} DESTINATION include)
 install(TARGETS RVO DESTINATION lib)
