@@ -27,7 +27,8 @@ extensions = [
               include_dirs=['src'],
               libraries=['RVO'],
               library_dirs=['build/RVO2/src'],
-              extra_compile_args=['-fPIC', '-fopenmp']),
+              extra_compile_args=['-fPIC', '-fopenmp'],
+              extra_link_args=['-fopenmp']),
 ]
 
 setup(
