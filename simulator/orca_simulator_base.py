@@ -15,7 +15,7 @@ import avo2
 
 from time import time
 import yaml
-
+from abc import ABCMeta, abstractmethod
 class OrcaFactory(object):
     def __init__(self) -> None:
         pass
@@ -29,6 +29,8 @@ class OrcaFactory(object):
             raise ValueError("The `library_name` must be set correctly.")
 
 class OrcaSimulator:
+    __metaclass__ = ABCMeta
+
     def __init__(self, config_file_name):
         # Load parameters from the YAML file
         config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), config_file_name)
@@ -120,18 +122,6 @@ class OrcaSimulator:
                 "pose": target_pose
             }
         
-        # for i in range(self.robot_number):
-        #     target_id = f"target{i+1}"
-        #     #self.targets[target_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": 0}
-        #     self.targets[target_id]["pose"] = {"x": 200, "y": 1120 - i * 800, "theta": 0}
-        
-        # for i in range(self.robot_number):
-        #     target_id = f"target{i+1}"
-        #     self.targets[target_id]["pose"] = {"x": self.circle_radius * np.cos(2 * np.pi * i / self.robot_number) + self.center_x,
-        #                                        "y": self.circle_radius * np.sin(2 * np.pi * i/ self.robot_number) + self.center_y,
-        #                                        "theta": 0
-        #                                       }
-        
         self.robots = {}
         for i in range(self.robot_number):  
             robot_pose = self.generate_safe_pose(self.robots)
@@ -145,10 +135,9 @@ class OrcaSimulator:
                 "goal_flag": False
             }
 
-        # for i in range(self.robot_number):
-        #     robot_id = f"robot{i+1}"
-        #     self.robots[robot_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
-        #     # self.robots[robot_id]["pose"] = {"x": 200, "y": 320 + i * 800, "theta": random.uniform(-np.pi, np.pi)} 
+    @abstractmethod
+    def set_pos(self):
+        pass
     
     def agents_init(self):
         self.agent_ids = {} # RVO agents

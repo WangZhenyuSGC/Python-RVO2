@@ -1,4 +1,7 @@
 from orca_simulator_base import OrcaSimulator
+import numpy as np
+import math
+import random
 
 class AVOSimulator(OrcaSimulator):
     def __init__(self, config_file_name = 'avo_config.yaml'):
@@ -9,6 +12,7 @@ class AVOSimulator(OrcaSimulator):
         self.accel_interval = self.config['accel_interval']
         self.sim.setTimeStep(self.time_step)
         
+        self.set_pos()
         self.agents_init()
 
     def add_agent(self, pos):
@@ -20,6 +24,15 @@ class AVOSimulator(OrcaSimulator):
         # AVOは障害物の設定がないため
         self.obsts = []
         self.obst_num = None
+    
+    def set_pos(self):
+        for i in range(self.robot_number):
+            target_id = f"target{i+1}"
+            self.targets[target_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": 0}
+    
+        for i in range(self.robot_number):
+            robot_id = f"robot{i+1}"
+            self.robots[robot_id]["pose"] = {"x": 500, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
 
 simulation = AVOSimulator()
 simulation.start_animation()
