@@ -1,7 +1,7 @@
 import sys
-# TODO: 自分のパスに合わせて変更
-sys.path.append('/home/0000410764/oss/Python-RVO2')
-sys.path.append('/home/0000410764/oss/AVO2')
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../../AVO2/")
 
 import os
 import matplotlib.pyplot as plt
