@@ -31,13 +31,13 @@ class OrcaFactory(object):
 class OrcaSimulator:
     __metaclass__ = ABCMeta
 
-    def __init__(self, config_file_name):
+    def __init__(self, config_file_name, robot_number):
         # Load parameters from the YAML file
         config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), config_file_name)
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
         
-        self.parameter_init()
+        self.parameter_init(robot_number)
 
         # The first three characters of config file name are the library name
         library_name = config_file_name[:3]
@@ -53,7 +53,7 @@ class OrcaSimulator:
         self.robot_init()
         self.obst_init()
     
-    def parameter_init(self):
+    def parameter_init(self, robot_number):
         self.time_step = self.config['time_step']
         self.neighbor_dist = self.config['neighbor_dist'] * 1000.0
         self.max_neighbors = self.config['max_neighbors']
@@ -72,7 +72,7 @@ class OrcaSimulator:
         self.L = self.config['wheel_distance'] * 1000.0
 
         # 描画用
-        self.robot_number = 10
+        self.robot_number = robot_number
         self.stop_animation = False
         self.fig, self.ax = plt.subplots()
         self.ani = None

@@ -4,8 +4,8 @@ import math
 import random
 
 class AVOSimulator(OrcaSimulator):
-    def __init__(self, config_file_name = 'avo_config.yaml'):
-        super().__init__(config_file_name)
+    def __init__(self, config_file_name = 'avo_config.yaml', robot_number = 5):
+        super().__init__(config_file_name, robot_number)
 
         # AVOの初期化方式は違うため
         self.max_accel = self.config['max_accel'] * 1000.0
@@ -34,5 +34,5 @@ class AVOSimulator(OrcaSimulator):
             robot_id = f"robot{i+1}"
             self.robots[robot_id]["pose"] = {"x": 500, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
 
-simulation = AVOSimulator()
+simulation = AVOSimulator('avo_config.yaml', 5)
 simulation.start_animation()
