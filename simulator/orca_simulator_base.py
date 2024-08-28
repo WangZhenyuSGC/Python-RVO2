@@ -329,14 +329,14 @@ class OrcaSimulator:
             self.ax.plot([obst[i][0] for i in range(len(obst))], [obst[i][1] for i in range(len(obst))], 'r-')
 
         if self.sim.getAgentCollabCoeff(agent_id) == 1.0:
-            self.ax.add_artist(plt.Circle([x, y], self.robot_radius, color='green', fill=True))
+            self.ax.add_artist(plt.Circle([x, y], self.effective_radius, color='green', fill=True))
         elif self.sim.getAgentCollabCoeff(agent_id) == 0:
-            self.ax.add_artist(plt.Circle([x, y], self.robot_radius, color='red', fill=True))
+            self.ax.add_artist(plt.Circle([x, y], self.effective_radius, color='red', fill=True))
         else:
-            self.ax.add_artist(plt.Circle([x, y], self.robot_radius, color='blue', fill=True))
+            self.ax.add_artist(plt.Circle([x, y], self.effective_radius, color='blue', fill=True))
         
         self.ax.plot([x, target_x], [y, target_y], 'g--')  # Dashed green line
-        self.ax.add_artist(plt.Circle([target_x, target_y], self.robot_radius, color='grey', fill=True))
+        self.ax.add_artist(plt.Circle([target_x, target_y], self.effective_radius, color='grey', fill=True))
         self.ax.annotate('', [x + self.ARROWLENGTH * np.cos(theta), y + self.ARROWLENGTH * np.sin(theta)], [x, y],
                             arrowprops=dict(arrowstyle='-|>', facecolor='red', edgecolor='red'))
         self.ax.text(x, y, agent_id + 1, color='white', ha='center', va='center')
@@ -428,8 +428,8 @@ class OrcaSimulator:
             # generate several ellipse vertices 
             vertices = []
             for i in range(0, 390, 30):
-                x = dead_pos[0] + 1.5 * self.robot_radius * math.cos(math.radians(i))
-                y = dead_pos[1] + 0.8 * self.robot_radius * math.sin(math.radians(i))
+                x = dead_pos[0] + 1.5 * self.effective_radius * math.cos(math.radians(i))
+                y = dead_pos[1] + 0.8 * self.effective_radius * math.sin(math.radians(i))
                 vertices.append((x, y))            
             # rotate the vertices around a random angle
             angle = random.uniform(-math.pi, math.pi)
