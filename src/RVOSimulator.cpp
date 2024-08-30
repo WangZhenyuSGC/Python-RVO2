@@ -30,9 +30,9 @@
  * <http://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef _OPENMP
-#  define _OPENMP 1 // OPENMP TEST
-#endif
+// #ifndef _OPENMP
+// #  define _OPENMP 1 // OPENMP TEST
+// #endif
 
 #include "RVOSimulator.h"
 

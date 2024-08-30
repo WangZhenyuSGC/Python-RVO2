@@ -52,17 +52,17 @@ if(WIN32)
 endif()
 
 # Find the OpenMP package
-find_package(OpenMP REQUIRED)
+# find_package(OpenMP REQUIRED)
 
-# Link the OpenMP libraries
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(RVO PUBLIC OpenMP::OpenMP_CXX)
-endif()
+# # Link the OpenMP libraries
+# if(OpenMP_CXX_FOUND)
+#     target_link_libraries(RVO PUBLIC OpenMP::OpenMP_CXX)
+# endif()
 
-# Add the OpenMP compile flags
-if(OpenMP_CXX_FOUND)
-    target_compile_options(RVO PUBLIC ${OpenMP_CXX_FLAGS})
-endif()
+# # Add the OpenMP compile flags
+# if(OpenMP_CXX_FOUND)
+#     target_compile_options(RVO PUBLIC ${OpenMP_CXX_FLAGS})
+# endif()
 
 install(FILES ${RVO_HEADERS} DESTINATION include)
 install(TARGETS RVO DESTINATION lib)
