@@ -37,6 +37,7 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
+#include <iostream>
 
 namespace RVO {
     Agent::Agent(RVOSimulator *sim) : maxNeighbors_(0), maxSpeed_(0.0f), neighborDist_(0.0f), radius_(0.0f), sim_(sim), timeHorizon_(0.0f), timeHorizonObst_(0.0f), collabCoeff_(0.5f), isDeadLock_(false), id_(0) {}
@@ -343,6 +344,8 @@ namespace RVO {
                     }
                 }
                 else {
+                    // /* Debug print for time step issue*/
+                    // std::cout << "***Detected collision, using timeStep to calculate velocity***" << std::endl;
                     /* Collision. Project on cut-off circle of time timeStep. */
                     const float invTimeStep = 1.0f / sim_->timeStep_;
 
@@ -354,6 +357,15 @@ namespace RVO {
 
                     line.direction = Vector2(unitW.y(), -unitW.x());
                     u = (combinedRadius * invTimeStep - wLength) * unitW;
+                    // std::cout << "Collision agent id: " << id_ << std::endl;
+                    // std::cout << "Collision agent position: " << position_ << std::endl;
+                    // std::cout << "Collision agent velocity: " << velocity_ << std::endl;
+                    // std::cout << "Collision relative velocity: " << relativeVelocity << std::endl;
+                    // std::cout << "Collision relative position: " << relativePosition << std::endl;
+                    // std::cout<< "calculated w: " << w << std::endl;
+                    // std::cout << "combinedRadius * invTimeStep - wLength: " << combinedRadius * invTimeStep - wLength << std::endl;
+                    // std::cout << "calculated u: " << u << std::endl;
+                    // std::cout << " " << std::endl;
                 }
 
                 // MFE changed velocity_ to prefVelocity_ s.t. ego agent adjusts its preferred speed, not current speed
