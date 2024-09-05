@@ -321,8 +321,19 @@ class OrcaSimulator:
         target_x = robot["goal"]["x"]
         target_y = robot["goal"]["y"]
         target_theta = robot["goal"]["theta"]
-        
+
         agent_id = self.agent_ids[robot_id]
+
+        # Initialize a dictionary to store past positions if it doesn't exist
+        if not hasattr(self, 'past_positions'):
+            self.past_positions = {}
+
+        # Initialize the past positions list for the robot if it doesn't exist
+        if robot_id not in self.past_positions:
+            self.past_positions[robot_id] = []
+
+        # Update the past positions list with the current position
+        self.past_positions[robot_id].append((x, y))
 
         # draw the obstacle
         for obst in self.obsts:
@@ -334,12 +345,17 @@ class OrcaSimulator:
             self.ax.add_artist(plt.Circle([x, y], self.effective_radius, color='red', fill=True))
         else:
             self.ax.add_artist(plt.Circle([x, y], self.effective_radius, color='blue', fill=True))
-        
+
         self.ax.plot([x, target_x], [y, target_y], 'g--')  # Dashed green line
         self.ax.add_artist(plt.Circle([target_x, target_y], self.effective_radius, color='grey', fill=True))
         self.ax.annotate('', [x + self.ARROWLENGTH * np.cos(theta), y + self.ARROWLENGTH * np.sin(theta)], [x, y],
-                            arrowprops=dict(arrowstyle='-|>', facecolor='red', edgecolor='red'))
+                        arrowprops=dict(arrowstyle='-|>', facecolor='red', edgecolor='red'))
         self.ax.text(x, y, agent_id + 1, color='white', ha='center', va='center')
+
+        # Plot the past positions once
+        if len(self.past_positions[robot_id]) > 1:
+            past_positions = self.past_positions[robot_id]
+            self.ax.plot([pos[0] for pos in past_positions], [pos[1] for pos in past_positions], 'bo-')  # Blue solid points and lines
 
     def update_loop(self, robot_id, robot):
         self.move(robot_id, robot)
@@ -348,7 +364,7 @@ class OrcaSimulator:
             
     def main_loop(self, frame):
         if self.stop_animation:
-            plt.close()
+            # plt.close()
             return
         
         self.ax.clear()
