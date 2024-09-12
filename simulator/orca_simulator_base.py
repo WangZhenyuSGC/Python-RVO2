@@ -72,6 +72,7 @@ class OrcaSimulator:
         self.L = self.config['wheel_distance'] * 1000.0
 
         # 描画用
+        self.robot_real_radius = 35
         self.robot_number = robot_number
         self.stop_animation = False
         self.fig, self.ax = plt.subplots()
@@ -340,14 +341,14 @@ class OrcaSimulator:
             self.ax.plot([obst[i][0] for i in range(len(obst))], [obst[i][1] for i in range(len(obst))], 'r-')
 
         if self.sim.getAgentCollabCoeff(agent_id) == 1.0:
-            self.ax.add_artist(plt.Circle([x, y], self.effective_radius, color='green', fill=True))
+            self.ax.add_artist(plt.Circle([x, y], self.robot_real_radius, color='green', fill=True))
         elif self.sim.getAgentCollabCoeff(agent_id) == 0:
-            self.ax.add_artist(plt.Circle([x, y], self.effective_radius, color='red', fill=True))
+            self.ax.add_artist(plt.Circle([x, y], self.robot_real_radius, color='red', fill=True))
         else:
-            self.ax.add_artist(plt.Circle([x, y], self.effective_radius, color='blue', fill=True))
+            self.ax.add_artist(plt.Circle([x, y], self.robot_real_radius, color='blue', fill=True))
 
         self.ax.plot([x, target_x], [y, target_y], 'g--')  # Dashed green line
-        self.ax.add_artist(plt.Circle([target_x, target_y], self.effective_radius, color='grey', fill=True))
+        self.ax.add_artist(plt.Circle([target_x, target_y], self.robot_real_radius, color='grey', fill=True))
         self.ax.annotate('', [x + self.ARROWLENGTH * np.cos(theta), y + self.ARROWLENGTH * np.sin(theta)], [x, y],
                         arrowprops=dict(arrowstyle='-|>', facecolor='red', edgecolor='red'))
         self.ax.text(x, y, agent_id + 1, color='white', ha='center', va='center')
