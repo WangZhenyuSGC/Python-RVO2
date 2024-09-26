@@ -16,10 +16,22 @@ class RVOSimulator(OrcaSimulator):
         self.agents_init()
         self.path_planning()
 
+        vertices = []
+        vertices.append((450,450))
+        vertices.append((450, 550))
+        vertices.append((350, 550))
+        vertices.append((350, 450))
+        vertices.append((450,450))
+
+        # 障害物設定
+        self.obsts.append(vertices)
+        self.sim.addObstacle(vertices)
+        self.sim.processObstacles()
+
     def find_closest_cell(self, x, y):
         # Setting the map as 14x14 grid, while each cell is 0.1 x 0.1. Unit is meter.
-        x = int(x / 100)
-        y = int(y / 100)
+        x = x / 100.0
+        y = y / 100.0
         return x, y
 
     def path_planning(self):
@@ -51,19 +63,19 @@ class RVOSimulator(OrcaSimulator):
         print(self.planned_paths)
 
     # def set_pos(self):
-    #     for i in range(self.robot_number):
-    #         target_id = f"target{i+1}"
-    #         self.targets[target_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": 0}
-    #     self.targets["target1"]["pose"]= {'x': 750, 'y': 150, 'theta': 0}
-    #     self.targets["target2"]["pose"]= {'x': 350, 'y': 650, 'theta': 0}
-    #     self.targets["target3"]["pose"]= {'x': 50, 'y': 750, 'theta': 0}
-    #     self.targets["target4"]["pose"]= {'x': 750, 'y': 950, 'theta': 0}
+    #     # for i in range(self.robot_number):
+    #     #     target_id = f"target{i+1}"
+    #     #     self.targets[target_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": 0}
+    #     self.targets["target1"]["pose"]= {'x': 400, 'y': 100, 'theta': 0}
+    #     self.targets["target2"]["pose"]= {'x': 400, 'y': 1100, 'theta': 0}
+    #     # self.targets["target3"]["pose"]= {'x': 50, 'y': 750, 'theta': 0}
+    #     # self.targets["target4"]["pose"]= {'x': 750, 'y': 950, 'theta': 0}
 
-    #     for i in range(self.robot_number):
-    #         robot_id = f"robot{i+1}"
-    #         self.robots[robot_id]["pose"] = {"x": 200, "y": 220 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
-    #     # self.robots["robot1"]["pose"]= {'x': 450, 'y': 850, 'theta': 0}
-    #     # self.robots["robot2"]["pose"]= {'x': 550, 'y': 950, 'theta': 0}
+    #     # for i in range(self.robot_number):
+    #     #     robot_id = f"robot{i+1}"
+    #     #     self.robots[robot_id]["pose"] = qqq{"x": 200, "y": 220 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
+    #     self.robots["robot1"]["pose"]= {'x': 400, 'y': 1100, 'theta': 0}
+    #     self.robots["robot2"]["pose"]= {'x': 400, 'y': 100, 'theta': 0}
     #     # self.robots["robot3"]["pose"]= {'x': 750, 'y': 550, 'theta': 0}
     #     # self.robots["robot4"]["pose"]= {'x': 250, 'y': 850, 'theta': 0}
 
@@ -86,9 +98,11 @@ class RVOSimulator(OrcaSimulator):
         goal_i, goal_j = self.specify_current_section(current_time, agent_id)
         if goal_i is None and goal_j is None:
             target = robot["goal"]
+            final_flag = True
         else:
-            print("Current target should be:", goal_i, goal_j)
+            # print("Current target should be:", goal_i, goal_j)
             target = {"x": goal_i * 100, "y": goal_j * 100}
+            final_flag = False
         
         effective_center = [robot["pose"]["x"] + self.D * math.cos(robot["pose"]["theta"]),
                             robot["pose"]["y"] + self.D * math.sin(robot["pose"]["theta"])]
@@ -126,12 +140,12 @@ class RVOSimulator(OrcaSimulator):
         else:
             self.sim.setAgentMaxSpeed(agent_id, self.lv_limit)
             self.sim.setAgentCollabCoeff(agent_id, 0.5)
-    
-        # # 目標点の一定距離内に入ったら理想速度を調整する
-        # if effective_distance_to_goal <= self.pos_threshold or distance_to_goal <= self.pos_threshold:
-        #     pref_vel = tuple(vector_to_goal)
-        #     # 正式のGOAL判定は有効中心ではなく実際の中心で行う
-        #     goal_flag = distance_to_goal <= self.pos_threshold  
+
+        # 目標点の一定距離内に入ったら理想速度を調整する
+        if effective_distance_to_goal <= self.pos_threshold or distance_to_goal <= self.pos_threshold and final_flag:
+            pref_vel = tuple(vector_to_goal)
+            # 正式のGOAL判定は有効中心ではなく実際の中心で行う
+            goal_flag = distance_to_goal <= self.pos_threshold  
 
         current_pose = tuple((robot["pose"]["x"], robot["pose"]["y"], robot["pose"]["theta"]))
         current_vel = tuple((robot["velocity"]["v"], robot["velocity"]["w"]))   
@@ -147,7 +161,7 @@ class RVOSimulator(OrcaSimulator):
 
         # RVO2に目標位置の方向（理想速度）を伝える
         self.sim.setAgentPrefVelocity(agent_id, tuple((pref_vel[0], pref_vel[1])))
-        # robot["goal_flag"] = goal_flag
+        robot["goal_flag"] = goal_flag
 
-simulation = RVOSimulator('rvo_config.yaml', 15)
+simulation = RVOSimulator('rvo_config.yaml', 10)
 simulation.start_animation()
