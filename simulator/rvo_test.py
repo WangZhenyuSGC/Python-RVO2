@@ -17,11 +17,21 @@ class RVOSimulator(OrcaSimulator):
         self.path_planning()
 
         vertices = []
-        vertices.append((450,450))
-        vertices.append((450, 550))
-        vertices.append((350, 550))
-        vertices.append((350, 450))
-        vertices.append((450,450))
+        # vertices.append((450,450))
+        # vertices.append((450, 550))
+        # vertices.append((350, 550))
+        # vertices.append((350, 450))
+        # vertices.append((450,450))
+
+        vertices.append((250, 350))
+        vertices.append((250, 650))
+        vertices.append((150, 650))
+        vertices.append((150, 250))
+        vertices.append((650, 250))
+        vertices.append((650, 650))
+        vertices.append((550, 650))
+        vertices.append((550, 350))
+        vertices.append((250, 350))
 
         # 障害物設定
         self.obsts.append(vertices)
@@ -62,22 +72,22 @@ class RVOSimulator(OrcaSimulator):
         self.planned_paths = self.ccbs.find_solution()
         print(self.planned_paths)
 
-    # def set_pos(self):
-    #     # for i in range(self.robot_number):
-    #     #     target_id = f"target{i+1}"
-    #     #     self.targets[target_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": 0}
-    #     self.targets["target1"]["pose"]= {'x': 400, 'y': 100, 'theta': 0}
-    #     self.targets["target2"]["pose"]= {'x': 400, 'y': 1100, 'theta': 0}
-    #     # self.targets["target3"]["pose"]= {'x': 50, 'y': 750, 'theta': 0}
-    #     # self.targets["target4"]["pose"]= {'x': 750, 'y': 950, 'theta': 0}
+    def set_pos(self):
+        # for i in range(self.robot_number):
+        #     target_id = f"target{i+1}"
+        #     self.targets[target_id]["pose"] = {"x": 200, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": 0}
+        self.targets["target1"]["pose"]= {'x': 400, 'y': 100, 'theta': 0}
+        self.targets["target2"]["pose"]= {'x': 400, 'y': 1100, 'theta': 0}
+        # self.targets["target3"]["pose"]= {'x': 50, 'y': 750, 'theta': 0}
+        # self.targets["target4"]["pose"]= {'x': 750, 'y': 950, 'theta': 0}
 
-    #     # for i in range(self.robot_number):
-    #     #     robot_id = f"robot{i+1}"
-    #     #     self.robots[robot_id]["pose"] = qqq{"x": 200, "y": 220 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
-    #     self.robots["robot1"]["pose"]= {'x': 400, 'y': 1100, 'theta': 0}
-    #     self.robots["robot2"]["pose"]= {'x': 400, 'y': 100, 'theta': 0}
-    #     # self.robots["robot3"]["pose"]= {'x': 750, 'y': 550, 'theta': 0}
-    #     # self.robots["robot4"]["pose"]= {'x': 250, 'y': 850, 'theta': 0}
+        # for i in range(self.robot_number):
+        #     robot_id = f"robot{i+1}"
+        #     self.robots[robot_id]["pose"] = qqq{"x": 200, "y": 220 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)} 
+        self.robots["robot1"]["pose"]= {'x': 400, 'y': 1100, 'theta': 0}
+        self.robots["robot2"]["pose"]= {'x': 400, 'y': 100, 'theta': 0}
+        # self.robots["robot3"]["pose"]= {'x': 750, 'y': 550, 'theta': 0}
+        # self.robots["robot4"]["pose"]= {'x': 250, 'y': 850, 'theta': 0}
 
     def specify_current_section(self, current_time, robot_id):
         for path in self.planned_paths['paths']:
@@ -89,79 +99,79 @@ class RVOSimulator(OrcaSimulator):
                         return section['goal_i'], section['goal_j']
         return None, None
 
-    def update_status_enlarge(self, robot_id, robot):
-        # Overwrite the update_status function in OrcaSimulator to update the pref vel to the next waypoint
-        # The current time since the simulation starts
-        current_time = self.sim.getGlobalTime()
-        # Find the corresponding section based on the current time from self.planned_paths
-        agent_id = self.agent_ids[robot_id]
-        goal_i, goal_j = self.specify_current_section(current_time, agent_id)
-        if goal_i is None and goal_j is None:
-            target = robot["goal"]
-            final_flag = True
-        else:
-            # print("Current target should be:", goal_i, goal_j)
-            target = {"x": goal_i * 100, "y": goal_j * 100}
-            final_flag = False
+    # def update_status_enlarge(self, robot_id, robot):
+    #     # Overwrite the update_status function in OrcaSimulator to update the pref vel to the next waypoint
+    #     # The current time since the simulation starts
+    #     current_time = self.sim.getGlobalTime()
+    #     # Find the corresponding section based on the current time from self.planned_paths
+    #     agent_id = self.agent_ids[robot_id]
+    #     goal_i, goal_j = self.specify_current_section(current_time, agent_id)
+    #     if goal_i is None and goal_j is None:
+    #         target = robot["goal"]
+    #         final_flag = True
+    #     else:
+    #         # print("Current target should be:", goal_i, goal_j)
+    #         target = {"x": goal_i * 100, "y": goal_j * 100}
+    #         final_flag = False
         
-        effective_center = [robot["pose"]["x"] + self.D * math.cos(robot["pose"]["theta"]),
-                            robot["pose"]["y"] + self.D * math.sin(robot["pose"]["theta"])]
+    #     effective_center = [robot["pose"]["x"] + self.D * math.cos(robot["pose"]["theta"]),
+    #                         robot["pose"]["y"] + self.D * math.sin(robot["pose"]["theta"])]
 
-        vector_to_goal = np.array(
-            [
-                target["x"] - robot["pose"]["x"], 
-                target["y"] - robot["pose"]["y"]
-            ]
-        )
+    #     vector_to_goal = np.array(
+    #         [
+    #             target["x"] - robot["pose"]["x"], 
+    #             target["y"] - robot["pose"]["y"]
+    #         ]
+    #     )
 
-        effective_vector_to_goal = np.array(
-            [
-                target["x"] - effective_center[0],
-                target["y"] - effective_center[1]
-            ]
-        )
+    #     effective_vector_to_goal = np.array(
+    #         [
+    #             target["x"] - effective_center[0],
+    #             target["y"] - effective_center[1]
+    #         ]
+    #     )
 
-        pref_vel = tuple(effective_vector_to_goal)
-        distance_to_goal = np.linalg.norm(vector_to_goal)
-        effective_distance_to_goal = np.linalg.norm(effective_vector_to_goal)        
-        goal_flag = False
-        distance_to_goal = np.linalg.norm(effective_vector_to_goal)
+    #     pref_vel = tuple(effective_vector_to_goal)
+    #     distance_to_goal = np.linalg.norm(vector_to_goal)
+    #     effective_distance_to_goal = np.linalg.norm(effective_vector_to_goal)        
+    #     goal_flag = False
+    #     distance_to_goal = np.linalg.norm(effective_vector_to_goal)
 
-        agent_id = self.agent_ids[robot_id]
-        self.distances[agent_id] = {"distance": distance_to_goal}
+    #     agent_id = self.agent_ids[robot_id]
+    #     self.distances[agent_id] = {"distance": distance_to_goal}
         
-        if robot_id in self.fallen_agents:         
-            self.sim.setAgentMaxSpeed(agent_id, 0)
-            self.sim.setAgentCollabCoeff(agent_id, 0.0)
-            self.sim.setAgentPosition(agent_id, (effective_center[0], effective_center[1]))
-            self.sim.setAgentVelocity(agent_id, (0.0,0.0))
-            self.sim.setAgentPrefVelocity(agent_id, (0, 0))
-            return
-        else:
-            self.sim.setAgentMaxSpeed(agent_id, self.lv_limit)
-            self.sim.setAgentCollabCoeff(agent_id, 0.5)
+    #     if robot_id in self.fallen_agents:         
+    #         self.sim.setAgentMaxSpeed(agent_id, 0)
+    #         self.sim.setAgentCollabCoeff(agent_id, 0.0)
+    #         self.sim.setAgentPosition(agent_id, (effective_center[0], effective_center[1]))
+    #         self.sim.setAgentVelocity(agent_id, (0.0,0.0))
+    #         self.sim.setAgentPrefVelocity(agent_id, (0, 0))
+    #         return
+    #     else:
+    #         self.sim.setAgentMaxSpeed(agent_id, self.lv_limit)
+    #         self.sim.setAgentCollabCoeff(agent_id, 0.5)
 
-        # 目標点の一定距離内に入ったら理想速度を調整する
-        if effective_distance_to_goal <= self.pos_threshold or distance_to_goal <= self.pos_threshold and final_flag:
-            pref_vel = tuple(vector_to_goal)
-            # 正式のGOAL判定は有効中心ではなく実際の中心で行う
-            goal_flag = distance_to_goal <= self.pos_threshold  
+    #     # 目標点の一定距離内に入ったら理想速度を調整する
+    #     if effective_distance_to_goal <= self.pos_threshold or distance_to_goal <= self.pos_threshold and final_flag:
+    #         pref_vel = tuple(vector_to_goal)
+    #         # 正式のGOAL判定は有効中心ではなく実際の中心で行う
+    #         goal_flag = distance_to_goal <= self.pos_threshold  
 
-        current_pose = tuple((robot["pose"]["x"], robot["pose"]["y"], robot["pose"]["theta"]))
-        current_vel = tuple((robot["velocity"]["v"], robot["velocity"]["w"]))   
-        effective_cur_vel = self.effective_vel_transform(current_pose, current_vel)
+    #     current_pose = tuple((robot["pose"]["x"], robot["pose"]["y"], robot["pose"]["theta"]))
+    #     current_vel = tuple((robot["velocity"]["v"], robot["velocity"]["w"]))   
+    #     effective_cur_vel = self.effective_vel_transform(current_pose, current_vel)
 
-        agent_id = self.agent_ids[robot_id]
+    #     agent_id = self.agent_ids[robot_id]
 
-        # RVO2に現在の位置と速度を伝える
-        self.sim.setAgentPosition(agent_id, tuple((effective_center[0], effective_center[1])))
+    #     # RVO2に現在の位置と速度を伝える
+    #     self.sim.setAgentPosition(agent_id, tuple((effective_center[0], effective_center[1])))
         
-        # 現在の速度を偏移された有効速度に変換してRVO2に伝える
-        self.sim.setAgentVelocity(agent_id, tuple((effective_cur_vel[0], effective_cur_vel[1])))
+    #     # 現在の速度を偏移された有効速度に変換してRVO2に伝える
+    #     self.sim.setAgentVelocity(agent_id, tuple((effective_cur_vel[0], effective_cur_vel[1])))
 
-        # RVO2に目標位置の方向（理想速度）を伝える
-        self.sim.setAgentPrefVelocity(agent_id, tuple((pref_vel[0], pref_vel[1])))
-        robot["goal_flag"] = goal_flag
+    #     # RVO2に目標位置の方向（理想速度）を伝える
+    #     self.sim.setAgentPrefVelocity(agent_id, tuple((pref_vel[0], pref_vel[1])))
+    #     robot["goal_flag"] = goal_flag
 
-simulation = RVOSimulator('rvo_config.yaml', 10)
+simulation = RVOSimulator('rvo_config.yaml', 2)
 simulation.start_animation()
