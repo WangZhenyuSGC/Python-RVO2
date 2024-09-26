@@ -16,3 +16,5 @@
 build/
 src/rvo2.cpp
 simulator/__pycache__/orca_simulator_base.cpython-310.pyc
+simulator/grid_task_log.xml
+simulator/grid_task.xml
