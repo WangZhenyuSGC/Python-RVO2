@@ -108,6 +108,7 @@ class OrcaSimulator:
         self.obsts = []
         self.obst_num = None
         self.obsts.append(vertices)
+        self.sim.addObstacle(vertices)
         self.sim.processObstacles()
 
     def add_agent(self, pos):
