@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <root>
-   <agent start_i="4.0" start_j="11.0" goal_i="4.0" goal_j="1.0"/>
-   <agent start_i="4.0" start_j="1.0" goal_i="4.0" goal_j="11.0"/>
+   <agent start_i="6.0" start_j="7.2" goal_i="6.0" goal_j="7.0"/>
+   <agent start_i="6.0" start_j="4.7" goal_i="4.618033988749895" goal_j="8.902113032590307"/>
+   <agent start_i="6.0" start_j="9.7" goal_i="2.3819660112501055" goal_j="8.175570504584947"/>
+   <agent start_i="6.0" start_j="2.2" goal_i="2.381966011250105" goal_j="5.824429495415054"/>
+   <agent start_i="6.0" start_j="12.2" goal_i="4.618033988749895" goal_j="5.097886967409693"/>
 </root>

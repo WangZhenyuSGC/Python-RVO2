@@ -1,6 +1,6 @@
 # rvo_config.yaml
 time_step: 0.033
-neighbor_dist: 0.3 # 2 * max_speed * time_horizon + 2 * effective_radius
+neighbor_dist: 0.8 # 2 * max_speed * time_horizon + 2 * effective_radius
 max_neighbors: 20
 time_horizon: 3.3 # 応答遅延は？
 time_horizon_obst: 3.3

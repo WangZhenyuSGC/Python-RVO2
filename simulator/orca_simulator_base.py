@@ -50,7 +50,7 @@ class OrcaSimulator:
                                           self.time_horizon_obst,
                                           self.effective_radius,
                                           self.lv_limit)
-        self.robot_init()
+        self.set_pos()
         self.obst_init()
     
     def parameter_init(self, robot_number):
@@ -114,7 +114,7 @@ class OrcaSimulator:
     def add_agent(self, pos):
         return self.sim.addAgent(pos)
     
-    def robot_init(self):
+    def set_pos(self):
         self.targets = {}
         for i in range(self.robot_number): 
             target_pose = self.generate_safe_pose(self.targets)
