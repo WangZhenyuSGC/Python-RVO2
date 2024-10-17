@@ -707,23 +707,7 @@ namespace RVO {
             addMovementConstraintsDiff(curAllowedError_, timeToHolo_, maxSpeed_, wMax_, heading_, v_max_ang,
                                        additionalOrcaLines_);
         }
-    }
-
-    void Agent::setHoloParams(double max_speed, double max_ang_speed, double min_error, double max_error, double curAllowedError, double time_to_holo)
-    {
-        maxSpeed_ = max_speed;
-        wMax_ = max_ang_speed;
-        minErrorHolo_ = min_error;
-        maxErrorHolo_ = max_error;
-        curAllowedError_ = curAllowedError;
-        timeToHolo_ = time_to_holo;
-    }
-
-    void Agent::setAgentAngularInfo(double heading, double ang_vel)
-    {
-        heading_ = heading;
-        angVel_ = ang_vel;
-    }
+    }   
 }
 
 void addMovementConstraintsDiffSimple(double max_track_speed, double heading,

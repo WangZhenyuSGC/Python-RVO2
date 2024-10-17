@@ -94,20 +94,6 @@ namespace RVO {
 		 */
 		void addNHConstraints(double min_dist);
 		
-		/**
-		 * \brief      Non-Holonomic対応用のパラメーターを初期化
-		 * \param      minErrorHolo 	実際は衝突する際に使われるため、つまりぶつかってから離れる距離
-		 * \param      maxErrorHolo 	論文中のエプシロン、Holoとの最大誤差距離
-		 * \param      velMaxW			論文中のVmax,w
-		 * \param      wMax				論文中のWmax、最大角速度、2Vmax/lw、lwは車輪の幅
-		 * \param      curAllowedError	現在の誤差許容範囲？不明
-		 * \param      timeToHolo		論文中のT、Holonomicの向きになるまでの時間
-		 *
-		 */
-		void setHoloParams(double minErrorHolo, double maxErrorHolo, double velMaxW, double wMax, double curAllowedError, double timeToHolo);
-
-		void setAgentAngularInfo(double heading, double angVel);
-
 		std::vector<std::pair<float, const Agent *> > agentNeighbors_;
 		size_t maxNeighbors_;
 		float maxSpeed_;
