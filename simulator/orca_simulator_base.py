@@ -113,29 +113,6 @@ class OrcaSimulator:
 
     def add_agent(self, pos):
         return self.sim.addAgent(pos)
-    
-    def set_pos(self):
-        self.targets = {}
-        for i in range(self.robot_number): 
-            target_pose = self.generate_safe_pose(self.targets)
-            target_id = f"target{i+1}"
-            self.targets[target_id] = {
-                "id": target_id,
-                "pose": target_pose
-            }
-        
-        self.robots = {}
-        for i in range(self.robot_number):  
-            robot_pose = self.generate_safe_pose(self.robots)
-            robot_id = f"robot{i+1}"
-            self.robots[robot_id] = {
-                "id": robot_id,
-                "pose": robot_pose,
-                "goal": None,
-                "velocity": {"v": 0.0, "w": 0.0},
-                "pos_flag": False, 
-                "goal_flag": False
-            }
 
     @abstractmethod
     def set_pos(self):
