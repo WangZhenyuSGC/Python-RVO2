@@ -41,6 +41,7 @@
 #include "Definitions.h"
 #include "RVOSimulator.h"
 
+static const float EPSILON = 0.001f;
 namespace RVO {
 	/**
 	 * \brief      Defines an agent in the simulation.
@@ -86,6 +87,27 @@ namespace RVO {
 		 */
 		void update();
 
+		/**
+		 * \brief      Adds the constrains for non-holomonic agents based on the nearest agent/obst
+		 * \param      min_dist        The minimum distance to keep from the nearest agent/obst.
+		 *
+		 */
+		void addNHConstraints(double min_dist);
+		
+		/**
+		 * \brief      Non-Holonomic対応用のパラメーターを初期化
+		 * \param      minErrorHolo 	実際は衝突する際に使われるため、つまりぶつかってから離れる距離
+		 * \param      maxErrorHolo 	論文中のエプシロン、Holoとの最大誤差距離
+		 * \param      velMaxW			論文中のVmax,w
+		 * \param      wMax				論文中のWmax、最大角速度、2Vmax/lw、lwは車輪の幅
+		 * \param      curAllowedError	現在の誤差許容範囲？不明
+		 * \param      timeToHolo		論文中のT、Holonomicの向きになるまでの時間
+		 *
+		 */
+		void setHoloParams(double minErrorHolo, double maxErrorHolo, double velMaxW, double wMax, double curAllowedError, double timeToHolo);
+
+		void setAgentAngularInfo(double heading, double angVel);
+
 		std::vector<std::pair<float, const Agent *> > agentNeighbors_;
 		size_t maxNeighbors_;
 		float maxSpeed_;
@@ -93,6 +115,7 @@ namespace RVO {
 		Vector2 newVelocity_;
 		std::vector<std::pair<float, const Obstacle *> > obstacleNeighbors_;
 		std::vector<Line> orcaLines_;
+		std::vector<Line> additionalOrcaLines_; // 追加したOrcaLines
 		Vector2 position_;
 		Vector2 prefVelocity_;
 		float radius_;
@@ -102,6 +125,14 @@ namespace RVO {
 		Vector2 velocity_;
 		float collabCoeff_;
 		bool isDeadLock_; // DeadLock処理用フラグ
+		double minErrorHolo_; // Holonomic用の最小誤差
+		double maxErrorHolo_;
+		double velMaxW_; // 論文のv_max_w
+		double wMax_; // 最大回転速度
+		double curAllowedError_;
+		double timeToHolo_; // Holonomicの向きになるまでの時間　T
+		float heading_; // Agentの向き
+		float angVel_; // Agentの今の角速度
 
 		size_t id_;
 
@@ -154,5 +185,15 @@ namespace RVO {
 	void linearProgram3(const std::vector<Line> &lines, size_t numObstLines, size_t beginLine,
 						float radius, Vector2 &result);
 }
+
+// NH計算用の関数
+void addMovementConstraintsDiffSimple(double max_track_speed, double heading, std::vector<RVO::Line>& additional_orca_lines);
+void addMovementConstraintsDiff(double error, double T, double max_vel_x, double max_vel_th, double heading, double v_max_ang, std::vector<RVO::Line>& additional_orca_lines);
+double beta(double T, double theta, double v_max_ang);
+double gamma(double T, double theta, double error, double v_max_ang);
+double calcVstar(double vh, double theta);
+double calcVstarError(double T,double theta, double error);
+double calculateMaxTrackSpeedAngle(double T, double theta, double error, double max_vel_x, double max_vel_th, double v_max_ang);
+double sign(double x);
 
 #endif /* RVO_AGENT_H_ */
