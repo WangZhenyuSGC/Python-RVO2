@@ -43,7 +43,8 @@ namespace RVO {
     Agent::Agent(RVOSimulator *sim) : 
     maxNeighbors_(0), maxSpeed_(0.0f), neighborDist_(0.0f), radius_(0.0f), sim_(sim), timeHorizon_(0.0f), timeHorizonObst_(0.0f), 
     collabCoeff_(0.5f), isDeadLock_(false), 
-    minErrorHolo_(0.0f),maxErrorHolo_(0.0f), velMaxW_(0.0f), wMax_(0.0f), curAllowedError_(0.0f), timeToHolo_(0.0f), heading_(0.0f), angVel_(0.0f),
+    minErrorHolo_(0.0f),maxErrorHolo_(0.0f), velMaxW_(0.0f), wMax_(0.0f), curAllowedError_(0.0f), timeToHolo_(0.0f), 
+    heading_(0.0f), angVel_(0.0f), wheelBase_(0.0f),
     id_(0)
     {}
 
@@ -448,7 +449,8 @@ namespace RVO {
         }
 
         // 線形計画での計算に入る前に、Non-holonomic用の制約を追加
-        double minDist = std::min(minDistAgent, minDistObst);
+        double minDist = sqrt(std::min(minDistAgent, minDistObst));
+        additionalOrcaLines_.clear();
         addNHConstraints(minDist);
 
         // 追加された制約はadditionalOrcaLines_に格納されているため、計算に移る前にinsertする
@@ -674,12 +676,11 @@ namespace RVO {
     void Agent::addNHConstraints(double min_dist){
         double min_error = minErrorHolo_;
         double max_error = maxErrorHolo_;
-        // double v_max_ang = velMaxW_;
-
-        double v_max_ang = maxSpeed_; // TODO: 現在の角速度で計算法に直すべき
+        double v_max_ang = maxSpeed_ - std::abs(angVel_) * wheelBase_ / 2.0; //  |v(t)| ≤ vmax,ω = vmax−|ω(t)|·L/2
 
         double error = max_error;
 
+        // すでに衝突したら
         if (min_dist < 2.0 * radius_) {
             error = (max_error - min_error) / (pow(2 * (radius_), 2)) *
                     pow(min_dist, 2) + min_error; // もともと使われているsqrは実際a * aなので、pow(a, 2)で置き換え
@@ -692,97 +693,87 @@ namespace RVO {
 
         double speed_ang = atan2(prefVelocity_.y(), prefVelocity_.x());
         // 今の向きとの差を計算
-        double dif_ang = speed_ang - heading_; // TODO: Normalize_angleを使って！！！
+        double dif_ang = normalizeAngle(speed_ang) - normalizeAngle(heading_); // TODO: Normalize_angleを使って！！！
+        double min_theta = normalizeAngle(dif_ang);
 
-        if (std::abs(dif_ang) > M_PI / 2.0) { // || curAllowedError_ < 2.0 * min_error) {
-            double max_track_speed = calculateMaxTrackSpeedAngle(timeToHolo_, M_PI / 2.0, curAllowedError_,
-                                                                 maxSpeed_, wMax_, v_max_ang);
-            if (max_track_speed <= 2 * min_error) {
-                max_track_speed = 2 * min_error;
-            }
+        std::cout << "**************Agent ID:" << id_ << std::endl;
 
-            addMovementConstraintsDiffSimple(max_track_speed, heading_, additionalOrcaLines_);
-        }
-        else {
-            addMovementConstraintsDiff(curAllowedError_, timeToHolo_, maxSpeed_, wMax_, heading_, v_max_ang,
-                                       additionalOrcaLines_);
-        }
-    }   
-}
+        // 現在の速度と目標速度の差が大きい場合、PI/2の角度で制約を追加
+        // if (std::abs(dif_ang) > M_PI / 2.0) { // || curAllowedError_ < 2.0 * min_error) {
+        //     std::cout << "---------------Angle Diff Huge-----------" << std::endl;
+        //     // PI/2の角度なら、横方向に移動する場合、フォローできる速度を計算
+        //     double max_track_speed = calculateMaxTrackSpeedAngle(timeToHolo_, M_PI / 2.0, curAllowedError_,
+        //                                                          maxSpeed_, wMax_, v_max_ang);
+        //     std::cout << "max_track_speed: " << max_track_speed << std::endl;
+        //     if (max_track_speed <= 2 * min_error) {
+        //         std::cout << "Using 2 * min_error instead" << std::endl;
+        //         max_track_speed = 2 * min_error;
+        //     }
 
-void addMovementConstraintsDiffSimple(double max_track_speed, double heading,
-                                        std::vector<RVO::Line> &additional_orca_lines) {
-    RVO::Line maxVel1;
-    RVO::Line maxVel2;
+        //     addMovementConstraintsDiffSimple(max_track_speed, heading_, additionalOrcaLines_);
+        // }
+        // else {
+        //     std::cout << "---------------Angle Diff Small-----------" << std::endl;
+        //     double min_theta = dif_ang;
+        //     double max_track_speed = calculateMaxTrackSpeedAngle(timeToHolo_, min_theta, error, maxSpeed_, wMax_, v_max_ang);
+        //     addMovementConstraintsDiff(max_track_speed, curAllowedError_, timeToHolo_, maxSpeed_, wMax_, heading_, min_theta, v_max_ang,
+        //                                additionalOrcaLines_);
+        // }
 
-    RVO::Vector2 dir = RVO::Vector2(cos(heading), sin(heading));
-    maxVel1.point = 0.95 * max_track_speed * RVO::Vector2(-dir.y(), dir.x());
-    maxVel1.direction = -dir;
-    maxVel2.direction = dir;
-    maxVel2.point = -max_track_speed * RVO::Vector2(-dir.y(), dir.x());
-    additional_orca_lines.push_back(maxVel1);
-    additional_orca_lines.push_back(maxVel2);
-    // Line line;
-    // line.point = -2*max_track_speed * Vector2(cos(heading), sin(heading));
-    // line.dir = normalize(maxVel2.point);
-    // additional_orca_lines.push_back(line);
-    // Line line2;
-    // line2.point = 10*max_track_speed * Vector2(cos(heading), sin(heading));
-    // line2.dir = rotateVectorByAngle(-normalize(maxVel2.point), -0.2);
-    // additional_orca_lines.push_back(line2);
-    // Line line3;
-    // line3.point = 10*max_track_speed * Vector2(cos(heading), sin(heading));
-    // line3.dir = rotateVectorByAngle(-normalize(maxVel2.point), 0.2);
-    // additional_orca_lines.push_back(line3);
-}
+        double max_track_speed = calculateMaxTrackSpeedAngle(timeToHolo_, min_theta, error, maxSpeed_, wMax_, v_max_ang);
+        addMovementConstraintsDiffSimple(max_track_speed, heading_, additionalOrcaLines_);
 
-void addMovementConstraintsDiff(double error, double T, double max_vel_x, double max_vel_th, double heading,
-                                double v_max_ang, std::vector<RVO::Line> &additional_orca_lines) {
-
-    // double steps2 = 180;
-    // std::cout << error<< std::endl;
-    // for (double i = -M_PI / 2.0; i <= M_PI / 2.0; i += M_PI/steps2) {
-    //   double speed = calculateMaxTrackSpeedAngle(T,i, error, max_vel_x, max_vel_th, v_max_ang);
-    //   //double vstarErr = calcVstarError(T,i,0.01);
-    //   std::cout << speed*cos(i) << "," << speed * sin(i) << ";";
-    //   //std::cout << speed << " vstar Err " << vstarErr <<" ang " << i <<std::endl;
-    // }
-    // std::cout << std::endl;
-
-    // for (double i = -M_PI / 2.0; i <= M_PI / 2.0; i += M_PI/steps2) {
-    //   double speed = calculateMaxTrackSpeedAngle(T,i, error, max_vel_x, max_vel_th, v_max_ang);
-    //   std::cout << speed << "," << i << std::endl;
-    // }
-    // std::cout << std::endl;
-
-
-    double min_theta = M_PI / 2.0;
-    double max_track_speed = calculateMaxTrackSpeedAngle(T, min_theta, error, max_vel_x, max_vel_th, v_max_ang);
-
-    RVO::Vector2 first_point = max_track_speed * RVO::Vector2(cos(heading - min_theta), sin(heading - min_theta));
-    double steps = 10.0;
-    double step_size = -M_PI / steps;
-    // Line line;
-    // line.point = -max_track_speed * Vector2(cos(heading), sin(heading));
-    // line.dir = normalize(first_point);
-    // additional_orca_lines.push_back(line);
-
-
-    for (int i = 1; i <= (int) steps; i++) {
-
+        // DEBUG PRINT
+        std::cout << "error: " << error << std::endl;
+        std::cout << "curAllowedError_: " << curAllowedError_ << std::endl;
+        std::cout << "v_max_ang: " << v_max_ang << std::endl;
+        std::cout << "speed_ang: " << speed_ang << std::endl;
+        std::cout << "dif_ang: " << dif_ang << std::endl;
+        std::cout << "heading_: " << heading_ << std::endl;
+        std::cout << "max_track_speed: " << max_track_speed << std::endl;
+    } 
+    
+    void Agent::addMovementConstraintsDiff(double max_track_speed, double error, double T, double max_vel_x, double max_vel_th, double heading,
+                                    double min_theta, double v_max_ang, std::vector<RVO::Line> &additional_orca_lines) {
+        RVO::Vector2 first_point = max_track_speed * RVO::Vector2(cos(heading - min_theta), sin(heading - min_theta));
+        //　min_thetaぐらい回転するため何ステップかを計算
+        // この処理は、min_thetaがPI/2以下のみ実行されるので、回転時間はtimeToHolo_を超えることはないはず
+        double steps = std::abs(min_theta / (wMax_ * sim_->timeStep_));
+        double step_size = min_theta / steps;
         RVO::Line line;
-        double cur_ang = min_theta + i * step_size;
-        RVO::Vector2 second_point = RVO::Vector2(cos(heading - cur_ang), sin(heading - cur_ang));
-        double track_speed = calculateMaxTrackSpeedAngle(T, cur_ang, error, max_vel_x, max_vel_th, v_max_ang);
-        second_point = track_speed * second_point;
-        line.point = first_point;
-        line.direction = normalize(second_point - first_point);
+        line.point = -max_track_speed * Vector2(cos(heading), sin(heading));
+        line.direction = normalize(first_point);
         additional_orca_lines.push_back(line);
-        //    ROS_DEBUG("line point 1 x, y, %f, %f, point 2 = %f,%f",first_point.x(),first_point.y(),second_point.x(),second_point.y());
-        first_point = second_point;
+
+        for (int i = 1; i <= (int) steps; i++) {
+            RVO::Line line;
+            double cur_ang = min_theta + i * step_size;
+            RVO::Vector2 second_point = RVO::Vector2(cos(heading - cur_ang), sin(heading - cur_ang));
+            double track_speed = calculateMaxTrackSpeedAngle(T, cur_ang, error, max_vel_x, max_vel_th, v_max_ang);
+            second_point = track_speed * second_point;
+            line.point = first_point;
+            line.direction = normalize(second_point - first_point);
+            additional_orca_lines.push_back(line);
+            first_point = second_point;
+        }
+    }  
+
+    void Agent::addMovementConstraintsDiffSimple(double max_track_speed, double heading,
+                                            std::vector<RVO::Line> &additional_orca_lines) {
+        RVO::Line maxVel1;
+        RVO::Line maxVel2;
+        
+        RVO::Vector2 dir = RVO::Vector2(cos(heading), sin(heading));
+        maxVel1.point = max_track_speed * RVO::Vector2(-dir.y(), dir.x());
+        maxVel1.direction = -dir;
+        maxVel2.direction = dir;
+        maxVel2.point = -max_track_speed * RVO::Vector2(-dir.y(), dir.x());
+        additional_orca_lines.push_back(maxVel1);
+        additional_orca_lines.push_back(maxVel2);
     }
 }
 
+// この部分の計算はもう大丈夫はず
 double beta(double T, double theta, double v_max_ang) {
     return -((2.0 * T * T * sin(theta)) / theta) * v_max_ang;
 }
@@ -802,12 +793,12 @@ double calcVstarError(double T, double theta, double error) {
 
 double calculateMaxTrackSpeedAngle(double T, double theta, double error, double max_vel_x, double max_vel_th,
                                     double v_max_ang) {
+    //　角度差が小さい場合、直進速度を返す
     if (fabs(theta) <= EPSILON)
         return max_vel_x;
     if (fabs(theta / T) <= max_vel_th) {
         double vstar_error = calcVstarError(T, theta, error);
         if (vstar_error <= v_max_ang) {
-            //return 0;
             return std::min(vstar_error * (2.0 * (1.0 - cos(theta))) / (theta * sin(theta)), max_vel_x);
         }
         else {
@@ -815,15 +806,24 @@ double calculateMaxTrackSpeedAngle(double T, double theta, double error, double 
             a = T * T;
             b = beta(T, theta, v_max_ang);
             g = gamma(T, theta, error, v_max_ang);
-            //return 1;
-            return std::min((-b + sqrt(pow(b, 2) - 4 * pow(a, 2) * g)) / (2.0 * g), max_vel_x);
+            return std::min((-b + sqrt(pow(b, 2) - 4 * a * g)) / (2.0 * g), max_vel_x);
         }
     }
-    else
-        //  return 2;
+    else {
         return std::min(sign(theta) * error * max_vel_th / theta, max_vel_x);
+    }
 }
 
 double sign(double x) {
     return (x > 0) - (x < 0);
+}
+
+double normalizeAngle(double angle) {
+    while (angle > M_PI) {
+        angle -= 2 * M_PI;
+    }
+    while (angle < -M_PI) {
+        angle += 2 * M_PI;
+    }
+    return angle;
 }

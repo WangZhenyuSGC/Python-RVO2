@@ -445,7 +445,7 @@ class OrcaSimulator:
 
     def start_animation(self):
         self.fig.canvas.mpl_connect('key_press_event', self.on_key)
-        self.initial_rotation()
+        # self.initial_rotation()
         plt.show()
 
 def clip(value, min_v, max_v):

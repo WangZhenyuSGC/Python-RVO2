@@ -93,6 +93,10 @@ namespace RVO {
 		 *
 		 */
 		void addNHConstraints(double min_dist);
+
+		void addMovementConstraintsDiff(double max_track_speed, double error, double T, double max_vel_x, double max_vel_th, double heading,
+                                    double min_theta, double v_max_ang, std::vector<RVO::Line> &additional_orca_lines);
+		void addMovementConstraintsDiffSimple(double max_track_speed, double heading, std::vector<RVO::Line>& additional_orca_lines);
 		
 		std::vector<std::pair<float, const Agent *> > agentNeighbors_;
 		size_t maxNeighbors_;
@@ -119,6 +123,7 @@ namespace RVO {
 		double timeToHolo_; // Holonomicの向きになるまでの時間　T
 		float heading_; // Agentの向き
 		float angVel_; // Agentの今の角速度
+		float wheelBase_; // 車輪間距離
 
 		size_t id_;
 
@@ -173,13 +178,12 @@ namespace RVO {
 }
 
 // NH計算用の関数
-void addMovementConstraintsDiffSimple(double max_track_speed, double heading, std::vector<RVO::Line>& additional_orca_lines);
-void addMovementConstraintsDiff(double error, double T, double max_vel_x, double max_vel_th, double heading, double v_max_ang, std::vector<RVO::Line>& additional_orca_lines);
 double beta(double T, double theta, double v_max_ang);
 double gamma(double T, double theta, double error, double v_max_ang);
 double calcVstar(double vh, double theta);
 double calcVstarError(double T,double theta, double error);
 double calculateMaxTrackSpeedAngle(double T, double theta, double error, double max_vel_x, double max_vel_th, double v_max_ang);
 double sign(double x);
+double normalizeAngle(double angle);
 
 #endif /* RVO_AGENT_H_ */

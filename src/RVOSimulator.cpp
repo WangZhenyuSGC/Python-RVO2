@@ -482,7 +482,7 @@ namespace RVO {
 		return agents_[agentNo]->isDeadLock_;
 	}
 	
-	void RVOSimulator::setHoloParams(size_t agentNo, double minErrorHolo, double maxErrorHolo, double velMaxW, double wMax, double curAllowedError, double timeToHolo)
+	void RVOSimulator::setHoloParams(size_t agentNo, double minErrorHolo, double maxErrorHolo, double velMaxW, double wMax, double curAllowedError, double timeToHolo, float wheelBase)
     {
         agents_[agentNo]->minErrorHolo_ = minErrorHolo;
         agents_[agentNo]->maxErrorHolo_ = maxErrorHolo;
@@ -490,6 +490,7 @@ namespace RVO {
 		agents_[agentNo]->wMax_ = wMax;
         agents_[agentNo]->curAllowedError_ = curAllowedError;
         agents_[agentNo]->timeToHolo_ = timeToHolo;
+		agents_[agentNo]->wheelBase_ = wheelBase;
     }
 
     void RVOSimulator::setAgentAngularInfo(size_t agentNo, double heading, double ang_vel)

@@ -639,7 +639,7 @@ namespace RVO {
 		 * \param      timeToHolo		論文中のT、Holonomicの向きになるまでの時間
 		 *
 		 */
-		void setHoloParams(size_t agentNo, double minErrorHolo, double maxErrorHolo, double velMaxW, double wMax, double curAllowedError, double timeToHolo);
+		void setHoloParams(size_t agentNo, double minErrorHolo, double maxErrorHolo, double velMaxW, double wMax, double curAllowedError, double timeToHolo, float wheelBase);
 
 		void setAgentAngularInfo(size_t agentNo, double heading, double angVel);
 
