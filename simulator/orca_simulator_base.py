@@ -114,9 +114,28 @@ class OrcaSimulator:
     def add_agent(self, pos):
         return self.sim.addAgent(pos)
 
-    @abstractmethod
     def set_pos(self):
-        pass
+        self.targets = {}
+        for i in range(self.robot_number): 
+            target_pose = self.generate_safe_pose(self.targets)
+            target_id = f"target{i+1}"
+            self.targets[target_id] = {
+                "id": target_id,
+                "pose": target_pose
+            }
+        
+        self.robots = {}
+        for i in range(self.robot_number):  
+            robot_pose = self.generate_safe_pose(self.robots)
+            robot_id = f"robot{i+1}"
+            self.robots[robot_id] = {
+                "id": robot_id,
+                "pose": robot_pose,
+                "goal": None,
+                "velocity": {"v": 0.0, "w": 0.0},
+                "pos_flag": False, 
+                "goal_flag": False
+            }
     
     def agents_init(self):
         self.agent_ids = {} # RVO agents
@@ -138,7 +157,7 @@ class OrcaSimulator:
             position_safe = True
             for member_id, member in group.items():
                 dist = math.sqrt((member["pose"]["x"] - x) ** 2 + (member["pose"]["y"] - y) ** 2)
-                if dist < 2 / 3 * self.neighbor_dist :
+                if dist < 4 * self.robot_real_radius:
                     position_safe = False
                     break
 
