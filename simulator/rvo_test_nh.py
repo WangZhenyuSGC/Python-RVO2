@@ -95,25 +95,27 @@ class NHRVOSimulator(OrcaSimulator):
         target_v = self.sim.getAgentVelocity(agent_id)
         target_speed = np.linalg.norm(target_v)
         target_ang = math.atan2(target_v[1], target_v[0])
-        dif_ang = self.normalize_angle(target_ang - robot["pose"]["theta"])
+        dif_ang = self.normalize_angle(target_ang) - self.normalize_angle(robot["pose"]["theta"])
+        dif_ang = self.normalize_angle(dif_ang)
 
         print("Planned vel, dif_ang:", agent_id, target_v, dif_ang)
 
         if abs(dif_ang) >= self.ang_threshold:
-            vstar = calcVstar(target_speed, abs(dif_ang))
+            vstar = calcVstar(target_speed, dif_ang)
         else:
             vstar = target_speed
 
         lv = max(min(vstar, self.lv_limit), -self.lv_limit) 
-        if self.last_twist_ang != 0.0:
-            w = np.sign(self.last_twist_ang) * min(abs(dif_ang / self.timeToHolo), self.wMax)
-        else:
-            w = np.sign(dif_ang) * min(abs(dif_ang / self.timeToHolo), self.wMax)
+        
+        if (abs(dif_ang) > 3.0 * np.pi / 4.0):
+            if self.last_twist_ang != 0.0:
+                w = np.sign(self.last_twist_ang) * min(abs(dif_ang / self.timeToHolo), self.wMax)
+            else:
+                w = np.sign(dif_ang) * min(abs(dif_ang / self.timeToHolo), self.wMax)
+            if abs(dif_ang) > np.pi:
+                lv = 0
             self.last_twist_ang = w
-        if abs(dif_ang) <= self.ang_threshold:
-            w = 0.0
-            self.last_twist_ang = 0.0
-        else: 
+        else:
             w = np.sign(dif_ang) * min(abs(dif_ang / self.timeToHolo), self.wMax)
             self.last_twist_ang = 0.0
         # print('--------------------------robot id, v, w before clip', (agent_id, lv, w))

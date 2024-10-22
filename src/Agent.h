@@ -94,8 +94,8 @@ namespace RVO {
 		 */
 		void addNHConstraints(double min_dist);
 
-		void addMovementConstraintsDiff(double max_track_speed, double error, double T, double max_vel_x, double max_vel_th, double heading,
-                                    double min_theta, double v_max_ang, std::vector<RVO::Line> &additional_orca_lines);
+		void addMovementConstraintsDiff(double error, double T, double max_vel_x, double max_vel_th, double heading,
+                                    double v_max_ang, std::vector<RVO::Line> &additional_orca_lines);
 		void addMovementConstraintsDiffSimple(double max_track_speed, double heading, std::vector<RVO::Line>& additional_orca_lines);
 		
 		std::vector<std::pair<float, const Agent *> > agentNeighbors_;

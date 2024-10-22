@@ -16,5 +16,5 @@ minErrorHolo: 0.01 # 実際は衝突する際に使われるため、つまり�
 maxErrorHolo: 0.02 # 論文中のエプシロン、Holoとの最大誤差距離
 velMaxW: 0.1 # 論文中のVmax,w
 wMax: 3.14159 # 論文中のWmax、最大角速度、2Vmax/lw、lwは車輪の幅
-curAllowedError: 0.01 # 現在の誤差許容範囲？不明
+curAllowedError: 0.0 # デフォルトは0.0
 timeToHolo: 0.33 # 論文中のT、Holonomicの向きになるまでの時間
