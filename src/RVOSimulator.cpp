@@ -491,6 +491,7 @@ namespace RVO {
         agents_[agentNo]->curAllowedError_ = curAllowedError;
         agents_[agentNo]->timeToHolo_ = timeToHolo;
 		agents_[agentNo]->wheelBase_ = wheelBase;
+		agents_[agentNo]->isUsingNH_ = true;
     }
 
     void RVOSimulator::setAgentAngularInfo(size_t agentNo, double heading, double ang_vel)

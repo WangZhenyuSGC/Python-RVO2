@@ -44,7 +44,7 @@ namespace RVO {
     maxNeighbors_(0), maxSpeed_(0.0f), neighborDist_(0.0f), radius_(0.0f), sim_(sim), timeHorizon_(0.0f), timeHorizonObst_(0.0f), 
     collabCoeff_(0.5f), isDeadLock_(false), 
     minErrorHolo_(0.0f),maxErrorHolo_(0.0f), velMaxW_(0.0f), wMax_(0.0f), curAllowedError_(0.0f), timeToHolo_(0.0f), 
-    heading_(0.0f), angVel_(0.0f), wheelBase_(0.0f),
+    heading_(0.0f), angVel_(0.0f), wheelBase_(0.0f), isUsingNH_(false),
     id_(0)
     {}
 
@@ -451,7 +451,9 @@ namespace RVO {
         // 線形計画での計算に入る前に、Non-holonomic用の制約を追加
         double minDist = sqrt(std::min(minDistAgent, minDistObst));
         additionalOrcaLines_.clear();
-        addNHConstraints(minDist);
+        if (isUsingNH_) {
+            addNHConstraints(minDist);
+        }
 
         // 追加された制約はadditionalOrcaLines_に格納されているため、計算に移る前にinsertする
         orcaLines_.insert(orcaLines_.end(), additionalOrcaLines_.begin(), additionalOrcaLines_.end());

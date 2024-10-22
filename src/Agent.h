@@ -124,6 +124,7 @@ namespace RVO {
 		float heading_; // Agentの向き
 		float angVel_; // Agentの今の角速度
 		float wheelBase_; // 車輪間距離
+		bool isUsingNH_; // NHを使うかどうか
 
 		size_t id_;
 
