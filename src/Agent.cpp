@@ -696,16 +696,16 @@ namespace RVO {
         double dif_ang = normalizeAngle(speed_ang) - normalizeAngle(heading_); // TODO: Normalize_angleを使って！！！
         double min_theta = normalizeAngle(dif_ang);
 
-        std::cout << "**************Agent ID:" << id_ << std::endl;
+        // std::cout << "**************Agent ID:" << id_ << std::endl;
 
         // 現在の速度と目標速度の差が大きい場合、PI/2の角度で制約を追加
         if (std::abs(dif_ang) > M_PI / 2.0) { // || curAllowedError_ < 2.0 * min_error) {
-            std::cout << "---------------Angle Diff Huge-----------" << std::endl;
+            // std::cout << "---------------Angle Diff Huge-----------" << std::endl;
             // PI/2の角度なら、横方向に移動する場合、フォローできる速度を計算
             double max_track_speed = calculateMaxTrackSpeedAngle(timeToHolo_, M_PI / 2.0, curAllowedError_,
                                                                  maxSpeed_, wMax_, v_max_ang);
             if (max_track_speed <= 2 * min_error) {
-                std::cout << "Using 2 * min_error instead" << std::endl;
+                // std::cout << "Using 2 * min_error instead" << std::endl;
                 max_track_speed = 2 * min_error;
             }
 
@@ -718,12 +718,12 @@ namespace RVO {
         // }
 
         // DEBUG PRINT
-        std::cout << "error: " << error << std::endl;
-        std::cout << "curAllowedError_: " << curAllowedError_ << std::endl;
-        std::cout << "v_max_ang: " << v_max_ang << std::endl;
-        std::cout << "speed_ang: " << speed_ang << std::endl;
-        std::cout << "dif_ang: " << dif_ang << std::endl;
-        std::cout << "heading_: " << heading_ << std::endl;
+        // std::cout << "error: " << error << std::endl;
+        // std::cout << "curAllowedError_: " << curAllowedError_ << std::endl;
+        // std::cout << "v_max_ang: " << v_max_ang << std::endl;
+        // std::cout << "speed_ang: " << speed_ang << std::endl;
+        // std::cout << "dif_ang: " << dif_ang << std::endl;
+        // std::cout << "heading_: " << heading_ << std::endl;
     } 
     
     void Agent::addMovementConstraintsDiff(double error, double T, double max_vel_x, double max_vel_th, double heading,

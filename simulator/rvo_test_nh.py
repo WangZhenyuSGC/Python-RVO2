@@ -98,7 +98,7 @@ class NHRVOSimulator(OrcaSimulator):
         dif_ang = self.normalize_angle(target_ang) - self.normalize_angle(robot["pose"]["theta"])
         dif_ang = self.normalize_angle(dif_ang)
 
-        print("Planned vel, dif_ang:", agent_id, target_v, dif_ang)
+        # print("Planned vel, dif_ang:", agent_id, target_v, dif_ang)
 
         if abs(dif_ang) >= self.ang_threshold:
             vstar = calcVstar(target_speed, dif_ang)
@@ -121,35 +121,35 @@ class NHRVOSimulator(OrcaSimulator):
         # print('--------------------------robot id, v, w before clip', (agent_id, lv, w))
         return lv, w
 
-    def set_pos(self):
-        self.targets = {}
-        self.robots = {}
-        for i in range(self.robot_number):
-            target_id = f"target{i+1}"
-            circle_radius = 200
-            center_x = 400
-            center_y = 700
-            target_x, target_y = circle(i, center_x, center_y, circle_radius, self.robot_number) 
-            target_pose = {"x": target_x, "y": target_y, "theta": random.uniform(-np.pi, np.pi)} 
-            self.targets[target_id] = {
-                "id": target_id,
-                "pose": target_pose
-            }
+    # def set_pos(self):
+    #     self.targets = {}
+    #     self.robots = {}
+    #     for i in range(self.robot_number):
+    #         target_id = f"target{i+1}"
+    #         circle_radius = 200
+    #         center_x = 400
+    #         center_y = 700
+    #         target_x, target_y = circle(i, center_x, center_y, circle_radius, self.robot_number) 
+    #         target_pose = {"x": target_x, "y": target_y, "theta": random.uniform(-np.pi, np.pi)} 
+    #         self.targets[target_id] = {
+    #             "id": target_id,
+    #             "pose": target_pose
+    #         }
 
-        for i in range(self.robot_number):
-            robot_id = f"robot{i+1}"            
-            robot_pose = {"x": 600, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)}
-            self.robots[robot_id] = {
-                "id": robot_id,
-                "pose": robot_pose,
-                "goal": None,
-                "velocity": {"v": 0.0, "w": 0.0},
-                "pos_flag": False, 
-                "goal_flag": False
-            }
+    #     for i in range(self.robot_number):
+    #         robot_id = f"robot{i+1}"            
+    #         robot_pose = {"x": 600, "y": 720 + (-1) ** i * 250 * int((i + 1) / 2), "theta": random.uniform(-np.pi, np.pi)}
+    #         self.robots[robot_id] = {
+    #             "id": robot_id,
+    #             "pose": robot_pose,
+    #             "goal": None,
+    #             "velocity": {"v": 0.0, "w": 0.0},
+    #             "pos_flag": False, 
+    #             "goal_flag": False
+    #         }
 
 def calcVstar(vh, theta):
     return vh * ((theta * math.sin(theta)) / (2.0 * (1.0 - math.cos(theta))))
 
-simulation = NHRVOSimulator('rvo_config_NH.yaml', 5)
+simulation = NHRVOSimulator('rvo_config_NH.yaml', 14)
 simulation.start_animation()

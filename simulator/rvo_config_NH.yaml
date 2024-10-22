@@ -6,7 +6,7 @@ time_horizon: 3.3 # 応答遅延は？
 time_horizon_obst: 3.3
 robot_radius: 0.022 # 本体半径 0.035->0.042
 wheel_distance: 0.025 #　車輪間隔
-enlarge_distance: 0.032 # non-holonomic用偏移量 (0.042 + 0.01)
+enlarge_distance: 0.012 # non-holonomic用偏移量 (0.042 + 0.01)
 max_speed: 0.1
 pos_threshold: 0.02
 ang_threshold: 0.05
@@ -17,4 +17,4 @@ maxErrorHolo: 0.02 # 論文中のエプシロン、Holoとの最大誤差距離
 velMaxW: 0.1 # 論文中のVmax,w
 wMax: 3.14159 # 論文中のWmax、最大角速度、2Vmax/lw、lwは車輪の幅
 curAllowedError: 0.0 # デフォルトは0.0
-timeToHolo: 0.33 # 論文中のT、Holonomicの向きになるまでの時間
+timeToHolo: 0.2 # 論文中のT、Holonomicの向きになるまでの時間
