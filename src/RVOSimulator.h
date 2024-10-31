@@ -643,6 +643,10 @@ namespace RVO {
 
 		void setAgentAngularInfo(size_t agentNo, double heading, double angVel);
 
+		void setAgentIsUsingNH(size_t agentNo, bool isUsingNH);
+
+		bool getAgentIsUsingNH(size_t agentNo) const;
+
 	private:
 		std::vector<Agent *> agents_;
 		Agent *defaultAgent_;

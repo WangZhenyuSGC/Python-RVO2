@@ -499,4 +499,14 @@ namespace RVO {
         agents_[agentNo]->heading_ = heading;
         agents_[agentNo]->angVel_ = ang_vel;
     }
+
+	void RVOSimulator::setAgentIsUsingNH(size_t agentNo, bool isUsingNH)
+	{
+		agents_[agentNo]->isUsingNH_ = isUsingNH;
+	}
+
+	bool RVOSimulator::getAgentIsUsingNH(size_t agentNo) const
+	{
+		return agents_[agentNo]->isUsingNH_;
+	}
 }

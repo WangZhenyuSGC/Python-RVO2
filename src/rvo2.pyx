@@ -82,6 +82,8 @@ cdef extern from "RVOSimulator.h" namespace "RVO":
         bool getAgentDeadLock(size_t agentNo) const
         void setHoloParams(size_t agentNo, double minErrorHolo, double maxErrorHolo, double velMaxW, double wMax, double curAllowedError, double timeToHolo, float wheelBase)
         void setAgentAngularInfo(size_t agentNo, double heading, double angVel)
+        void setAgentIsUsingNH(size_t agentNo, bool isUsingNH)
+        bool getAgentIsUsingNH(size_t agentNo) const
 
 
 cdef class PyRVOSimulator:
@@ -255,3 +257,7 @@ cdef class PyRVOSimulator:
         self.thisptr.setHoloParams(agent_no, minErrorHolo, maxErrorHolo, velMaxW, wMax, curAllowedError, timeToHolo, wheelBase)
     def setAgentAngularInfo(self, size_t agent_no, double heading, double angVel):
         self.thisptr.setAgentAngularInfo(agent_no, heading, angVel)
+    def setAgentIsUsingNH(self, size_t agent_no, bool is_using_NH):
+        self.thisptr.setAgentIsUsingNH(agent_no, is_using_NH)
+    def getAgentIsUsingNH(self, size_t agent_no):
+        return self.thisptr.getAgentIsUsingNH(agent_no)
