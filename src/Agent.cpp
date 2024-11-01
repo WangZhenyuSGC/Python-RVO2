@@ -321,7 +321,11 @@ namespace RVO {
                 const Vector2 relativePosition = other->position_ - position_;
                 const Vector2 relativeVelocity = velocity_ - other->velocity_; // might as well compute VO based on intended relVel, not a relVel that's not desirable?
                 const float distSq = absSq(relativePosition);
-                const float combinedRadius = radius_ + other->radius_ + curAllowedError_; // 1022: NH用
+                float combinedRadius = radius_ + other->radius_;
+                if (isUsingNH_) {
+                    combinedRadius = radius_ + other->radius_ + curAllowedError_;
+                } // 1022: NH用
+
                 const float combinedRadiusSq = sqr(combinedRadius);
 
                 if (distSq < minDistAgent){
